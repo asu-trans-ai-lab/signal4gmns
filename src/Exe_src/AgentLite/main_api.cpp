@@ -589,7 +589,6 @@ public:
 			for (int m = 0; m <= movementSize; m++)
 			{
 				saturation_Flow_Rate_Matrix[s][m] = 0;
-
 			}
 
 			for (int d = 0; d <= directionSize; d++)
@@ -801,16 +800,21 @@ public:
 		//y_StageMax
 		for (size_t i = 1; i <= stage_Range; i++)
 		{
-			for (size_t j = 1; j <= movement_Range; j++)
+			y_Max_Stage_Array[i] = 0;
+
+			for (size_t m = 1; m <= movement_Range; m++)
 			{
-				if (saturation_Flow_Rate_Matrix[i][j] != 0)
+				if (saturation_Flow_Rate_Matrix[i][m] != 0 && movement_Array[m].Enable && movement_Array[m].StageNo == i)
 				{
-					y_Stage_Movement_Matrix[i][j] = double(movement_Array[j].Volume) / double(saturation_Flow_Rate_Matrix[i][j]);
+					y_Stage_Movement_Matrix[i][m] = double(movement_Array[m].Volume) / double(saturation_Flow_Rate_Matrix[i][m]);
+
 					//double stage_Direction_Candidates_Matrix[stageSize][directionSize][groupSize]
-					stage_Direction_Candidates_Matrix[i][movement_Array[j].DirectionNo][movement_Array[j].GroupNo] += y_Stage_Movement_Matrix[i][j];
-					if (stage_Direction_Candidates_Matrix[i][movement_Array[j].DirectionNo][movement_Array[j].GroupNo] >= y_Max_Stage_Array[i])
+					stage_Direction_Candidates_Matrix[i][movement_Array[m].DirectionNo][movement_Array[m].GroupNo] += y_Stage_Movement_Matrix[i][m];
+
+					// we tally the movement matrix from this direction and this group number, so we can distingush movements belonging to different directions 
+					if (stage_Direction_Candidates_Matrix[i][movement_Array[m].DirectionNo][movement_Array[m].GroupNo] >= y_Max_Stage_Array[i])
 					{
-						y_Max_Stage_Array[i] = stage_Direction_Candidates_Matrix[i][movement_Array[j].DirectionNo][movement_Array[j].GroupNo];
+						y_Max_Stage_Array[i] = stage_Direction_Candidates_Matrix[i][movement_Array[m].DirectionNo][movement_Array[m].GroupNo];
 					}
 				}
 			}
@@ -827,7 +831,7 @@ public:
 
 	void Calculating_the_Minimum_Cycle_Length()
 	{
-		c_Min = max(30, (l - x_c_Input) / (x_c_Input - y_StageMax));
+		c_Min = max(60, (l - x_c_Input) / (x_c_Input - y_StageMax));
 	}
 
 	void Calculating_the_x_c_Output()
@@ -838,9 +842,12 @@ public:
 
 	void Calculating_Green_Time_for_Stages()
 	{
-		for (size_t i = 0; i <= stage_Range; i++)
+		for (size_t i = 1; i <= stage_Range; i++)
 		{
-			green_Time_Stage_Array[i] = y_Max_Stage_Array[i] * c_Min / x_c_output;
+//			green_Time_Stage_Array[i] = y_Max_Stage_Array[i] * c_Min / x_c_output;
+			green_Time_Stage_Array[i] = y_Max_Stage_Array[i] * c_Min / y_StageMax;
+
+			
 		}
 	}
 
