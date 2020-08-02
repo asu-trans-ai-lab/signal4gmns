@@ -498,16 +498,20 @@ struct SMovementData
 	enum stage StageNo;
 	int Volume;
 	int Lanes;
+	int SharedLanes;
 	enum group GroupNo;//L->1;T/R->2
 	enum direction DirectionNo;
+
+
+	//by Acquisition through processing
+	int Assignment_Order;// Differentiate primary and secondary movements, then determine stages  according to volumes
+	enum left_Turn_Treatment Left_Turn_Treatment;
+
 };
 
 
-#pragma endregion
-
 #pragma region Method_Declarations
 
-//SMovementData getMovementData_from_PhaseID_and_RingID(enum movement_Index type);//enable=false
 
 #pragma endregion
 
@@ -516,9 +520,10 @@ struct SMovementData
 
 //enum
 enum movement_Index { EBL = 1, EBT = 2, EBR = 3, WBL = 4, WBT = 5, WBR = 6, NBL = 7, NBT = 8, NBR = 9, SBL = 10, SBT = 11, SBR = 12 };
-enum stage { stage1 = 1, stage2 = 2, stage3 = 3 };
+enum stage { stage1 = 1, stage2 = 2, stage3 = 3, stage4 = 4 };
 enum direction { E = 1, W = 2, N = 3, S = 4 };
 enum group { L = 1, T_AND_R = 2 };
+enum left_Turn_Treatment { prot = 0, perm = 1, no_business = -1 };
 
 //array size, for constructing matirx or array
 const int laneColumnSize = 32;
@@ -534,6 +539,10 @@ const int groupSize = 5;
 //parameters
 double l = 12;
 double x_c_Input = 0.9;
+double PHF = 0.9;
+
+double f_1 = 1;
+double f_2 = 1;
 
 #pragma endregion
 
@@ -544,7 +553,7 @@ double x_c_Input = 0.9;
 class CSignalNode
 {
 public:
-	CSignalNode()
+	CSignalNode()//Constructor
 	{
 		y_StageMax = 1;
 		x_c_output = 0.9;
@@ -566,6 +575,20 @@ public:
 		movement_str_to_index_map["SBT"] = SBT;
 		movement_str_to_index_map["SBR"] = SBR;
 
+		movement_str_array[EBL] = "EBL";
+		movement_str_array[EBT] = "EBT";
+		movement_str_array[EBR] = "EBR";
+		movement_str_array[WBL] = "WBL";
+		movement_str_array[WBT] = "WBT";
+		movement_str_array[WBR] = "WBR";
+		movement_str_array[NBL] = "NBL";
+		movement_str_array[NBT] = "NBT";
+		movement_str_array[NBR] = "NBR";
+		movement_str_array[SBL] = "SBL";
+		movement_str_array[SBT] = "SBT";
+		movement_str_array[SBR] = "SBR";
+
+
 		movement_str_to_direction_map["EBL"] = E;
 		movement_str_to_direction_map["EBT"] = E;
 		movement_str_to_direction_map["EBR"] = E;
@@ -582,6 +605,32 @@ public:
 		movement_str_to_direction_map["SBT"] = S;
 		movement_str_to_direction_map["SBR"] = S;
 
+
+		left_Movement_Opposing_Index_Map[EBL] = WBT;
+		left_Movement_Opposing_Index_Map[WBL] = EBT;
+		left_Movement_Opposing_Index_Map[NBL] = SBT;
+		left_Movement_Opposing_Index_Map[SBL] = NBT;
+
+		
+		left_Movement_Counterpart_Index_Map[EBL] = EBT;
+		left_Movement_Counterpart_Index_Map[WBL] = WBT;
+		left_Movement_Counterpart_Index_Map[NBL] = NBT;
+		left_Movement_Counterpart_Index_Map[SBL] = SBT;
+
+
+		movement_Index_to_Group_Map[EBL] = group(1);
+		movement_Index_to_Group_Map[EBT] = group(2);
+		movement_Index_to_Group_Map[EBR] = group(2);
+		movement_Index_to_Group_Map[WBL] = group(1);
+		movement_Index_to_Group_Map[WBT] = group(2);
+		movement_Index_to_Group_Map[WBR] = group(2);
+		movement_Index_to_Group_Map[NBL] = group(1);
+		movement_Index_to_Group_Map[NBT] = group(2);
+		movement_Index_to_Group_Map[NBR] = group(2);
+		movement_Index_to_Group_Map[SBL] = group(1);
+		movement_Index_to_Group_Map[SBT] = group(2);
+		movement_Index_to_Group_Map[SBR] = group(2);
+
 		for (int s = 0; s <= stageSize; s++)
 		{
 			y_Max_Stage_Array[s] = 0;
@@ -592,25 +641,30 @@ public:
 			}
 
 			for (int d = 0; d <= directionSize; d++)
-				for(int g = 0; g <= groupSize; g++)
-			{
+				for (int g = 0; g <= groupSize; g++)
+				{
 					stage_Direction_Candidates_Matrix[s][d][g] = 0;
-
-			}
+				}
 
 		}
-
-		Set_Movement_to_Stage_Array();   
 	}
 	int movement_Range = 12;
-	int stage_Range = 3;
+	int stage_Range;
 
 	std::map<string, movement_Index> movement_str_to_index_map;
+	string movement_str_array[movementSize + 1];
+		
 	std::map<string, direction> movement_str_to_direction_map;
+
+	std::map<enum movement_Index, enum movement_Index> left_Movement_Opposing_Index_Map;
+
+	std::map<enum movement_Index, enum movement_Index> left_Movement_Counterpart_Index_Map;//L -> T
+
+	std::map<enum movement_Index, enum group> movement_Index_to_Group_Map;
 
 
 	//array
-	enum stage movement_to_Stage_Array[movementSize + 1];
+
 	SMovementData movement_Array[movementSize + 1]; //indexed by enum movement_Direction
 	int green_Start_Stage_Array[stageSize + 1];
 	int green_End_Stage_Array[stageSize+1];
@@ -618,6 +672,8 @@ public:
 	double green_Time_Stage_Array[stageSize + 1];
 	double cumulative_green_start_time_Stage_Array[stageSize + 1];
 	double cumulative_green_end_time_Stage_Array[stageSize + 1];
+
+
 
 
 	//matrix
@@ -637,28 +693,92 @@ public:
 	double x_c_output;
 	double c_Min;
 
-	void AddMovementVolume(int link_seq_no, string str, float volume)
+	void AddMovementVolume(int link_seq_no, string str, float volume,int lanes)
 	{
-		movement_Index mi = movement_str_to_index_map[str];
-		direction di = movement_str_to_direction_map[str];
+		enum movement_Index mi = movement_str_to_index_map[str];
+		enum direction di = movement_str_to_direction_map[str];
 
-			movement_Array[mi].Enable = true;
-			movement_Array[mi].LinkSeqNo = link_seq_no;
-			movement_Array[mi].Volume = volume;
-			movement_Array[mi].StageNo = stage(movement_to_Stage_Array[mi]);
-			movement_Array[mi].GroupNo = group(mi);
-			movement_Array[mi].DirectionNo = di;
-		
+		movement_Array[mi].Enable = true;
+		movement_Array[mi].LinkSeqNo = link_seq_no;
+		movement_Array[mi].Volume = volume;
+		//movement_Array[mi].StageNo = stage(movement_to_Stage_Array[mi]);
+		movement_Array[mi].GroupNo = movement_Index_to_Group_Map[mi];
+		movement_Array[mi].DirectionNo = di;
+		movement_Array[mi].Left_Turn_Treatment = no_business;
+
+
+		movement_Array[mi].Lanes = lanes;
+
+	}
+
+	void Set_Left_Turn_Treatment()
+	{
+		for (size_t m = 1; m <= movement_Range; m++)
+		{
+			int final_decision;
+			if (movement_Array[m].GroupNo == 1)
+			{
+				final_decision = 1;
+				//(1)	Left-turn Lane Check
+				if (movement_Array[m].Lanes > 1)
+				{
+					final_decision = 0;
+				}
+				//(2)	Minimum Volume Check
+				if (movement_Array[m].Volume >= 240)
+				{
+					final_decision = 0;
+				}
+				//(3)	Opposing Through Lanes Check
+				int op_Movement_Index = left_Movement_Opposing_Index_Map[movement_Index(m)];
+				if (movement_Array[op_Movement_Index].Lanes >= 4)
+				{
+					final_decision = 0;
+				}
+				//(4)	Opposing Traffic Speed Check
+
+				//(5)	Minimum Cross-Product Check
+				int co_Movement_Index = left_Movement_Counterpart_Index_Map[movement_Index(m)];
+				if (movement_Array[co_Movement_Index].Lanes > 1)
+				{
+					if (movement_Array[co_Movement_Index].Volume * movement_Array[m].Volume >= 100000)
+					{
+						final_decision = 0;
+					}
+				}
+				else
+				{
+
+					if (movement_Array[co_Movement_Index].Volume * movement_Array[m].Volume >= 50000)
+					{
+						final_decision = 0;
+					}
+				}
+			}
+			else
+			{
+				final_decision = -1;
+			}
+			movement_Array[m].Left_Turn_Treatment = left_Turn_Treatment(final_decision);
+		}
 	}
 
 	void PerformQEM()
 	{
-		// step 1: input movement volume
+		// step 1: decide protected or not
+
+		Set_Left_Turn_Treatment();
+
+		// step 2: set stages
+
+		Set_StageNo_for_Movements();   // change position
 
 
-		Set_Saturation_Flow_Rate_Matrix(); // to do:
+		//step 3: set saturation flow rate matrix
 
-		//step 2: Calculating Flow Ratio
+		Set_Saturation_Flow_Rate_Matrix(); 
+
+		//step 4: Calculating Flow Ratio
 		cout << "Calculating Flow Ratio \n";
 		Calculating_Flow_of_Ratio_Max();
 		cout << y_StageMax << endl;
@@ -677,118 +797,271 @@ public:
 
 	}
 
-	void Set_Movement_to_Stage_Array()
+	void Set_StageNo_for_Movements()
 	{
-		//movement_Array
-		movement_to_Stage_Array[EBL] = stage1;
-		movement_to_Stage_Array[EBT] = stage2;
-		movement_to_Stage_Array[EBR] = stage2;
-		movement_to_Stage_Array[WBL] = stage1;
-		movement_to_Stage_Array[WBT] = stage2;
-		movement_to_Stage_Array[WBR] = stage2;
-		movement_to_Stage_Array[NBL] = stage3;
-		movement_to_Stage_Array[NBT] = stage3;
-		movement_to_Stage_Array[NBR] = stage3;
-		movement_to_Stage_Array[SBL] = stage3;
-		movement_to_Stage_Array[SBT] = stage3;
-		movement_to_Stage_Array[SBR] = stage3;
+		//Determining the main direction
+		int east_And_West_Volume = movement_Array[EBL].Volume + movement_Array[EBT].Volume + movement_Array[EBR].Volume +
+			movement_Array[WBL].Volume + movement_Array[WBT].Volume + movement_Array[WBR].Volume;
+
+		int north_And_South_Volume = movement_Array[NBL].Volume + movement_Array[NBT].Volume + movement_Array[NBR].Volume +
+			movement_Array[SBL].Volume + movement_Array[SBT].Volume + movement_Array[SBR].Volume;
+
+		stage_Range = 2;
+		bool east_And_West_Flag = false;
+		bool north_And_South_Flag = false;
+
+		if (movement_Array[EBL].Left_Turn_Treatment == prot)
+		{
+			stage_Range++;
+			east_And_West_Flag = true;
+		}
+		else if (movement_Array[WBL].Left_Turn_Treatment == prot)
+		{
+			stage_Range++;
+			east_And_West_Flag = true;
+
+		}
+
+		if (movement_Array[NBL].Left_Turn_Treatment == prot)
+		{
+			stage_Range++;
+			north_And_South_Flag = true;
+		}
+		else if (movement_Array[SBL].Left_Turn_Treatment == prot)
+		{
+			stage_Range++;
+			north_And_South_Flag = true;
+
+		}
+		enum movement_Index firstL;
+		enum movement_Index firstT;
+		enum movement_Index firstR;
+		enum movement_Index secondL;
+		enum movement_Index secondT;
+		enum movement_Index secondR;
+		enum movement_Index thridL;
+		enum movement_Index thridT;
+		enum movement_Index thridR;
+		enum movement_Index fouthL;
+		enum movement_Index fouthT;
+		enum movement_Index fouthR;
+		if (east_And_West_Volume >= north_And_South_Volume)
+		{
+			//east and west first
+			firstL = EBL;
+			firstT = EBT;
+			firstR = EBR;
+			secondL = WBL;
+			secondT = WBT;
+			secondR = WBR;
+			thridL = NBL;
+			thridT = NBT;
+			thridR = NBR;
+			fouthL = SBL;
+			fouthT = SBT;
+			fouthR = SBR;
+		}
+		else
+		{
+
+			firstL = NBL;
+			firstT = NBT;
+			firstR = NBR;
+			secondL = SBL;
+			secondT = SBT;
+			secondR = SBR;
+			thridL = EBL;
+			thridT = EBT;
+			thridR = EBR;
+			fouthL = WBL;
+			fouthT = WBT;
+			fouthR = WBR;
+		}
+
+
+		if (east_And_West_Flag)
+		{
+			movement_Array[firstL].StageNo = stage1;
+			movement_Array[firstT].StageNo = stage2;
+			movement_Array[firstR].StageNo = stage2;
+			movement_Array[secondL].StageNo = stage1;
+			movement_Array[secondT].StageNo = stage2;
+			movement_Array[secondR].StageNo = stage2;
+			if (north_And_South_Flag)
+			{
+				movement_Array[thridL].StageNo = stage3;
+				movement_Array[thridT].StageNo = stage4;
+				movement_Array[thridR].StageNo = stage4;
+				movement_Array[fouthL].StageNo = stage3;
+				movement_Array[fouthT].StageNo = stage4;
+				movement_Array[fouthR].StageNo = stage4;
+			}
+			else
+			{
+				movement_Array[thridL].StageNo = stage3;
+				movement_Array[thridT].StageNo = stage3;
+				movement_Array[thridR].StageNo = stage3;
+				movement_Array[fouthL].StageNo = stage3;
+				movement_Array[fouthT].StageNo = stage3;
+				movement_Array[fouthR].StageNo = stage3;
+			}
+
+		}
+		else
+		{
+			movement_Array[firstL].StageNo = stage1;
+			movement_Array[firstT].StageNo = stage1;
+			movement_Array[firstR].StageNo = stage1;
+			movement_Array[secondL].StageNo = stage1;
+			movement_Array[secondT].StageNo = stage1;
+			movement_Array[secondR].StageNo = stage1;
+			if (north_And_South_Flag)
+			{
+				movement_Array[thridL].StageNo = stage2;
+				movement_Array[thridT].StageNo = stage3;
+				movement_Array[thridR].StageNo = stage3;
+				movement_Array[fouthL].StageNo = stage2;
+				movement_Array[fouthT].StageNo = stage3;
+				movement_Array[fouthR].StageNo = stage3;
+			}
+			else
+			{
+				movement_Array[thridL].StageNo = stage2;
+				movement_Array[thridT].StageNo = stage2;
+				movement_Array[thridR].StageNo = stage2;
+				movement_Array[fouthL].StageNo = stage2;
+				movement_Array[fouthT].StageNo = stage2;
+				movement_Array[fouthR].StageNo = stage2;
+			}
+		}
+
+		//movement_Array[EBL].StageNo = stage1;
+		//movement_Array[EBT].StageNo = stage2;
+		//movement_Array[EBR].StageNo = stage2;
+		//movement_Array[WBL].StageNo = stage1;
+		//movement_Array[WBT].StageNo = stage2;
+		//movement_Array[WBR].StageNo = stage2;
+		//movement_Array[NBL].StageNo = stage3;
+		//movement_Array[NBT].StageNo = stage3;
+		//movement_Array[NBR].StageNo = stage3;
+		//movement_Array[SBL].StageNo = stage3;
+		//movement_Array[SBT].StageNo = stage3;
+		//movement_Array[SBR].StageNo = stage3;
 	}
 
 
-	void Set_Movement_Array()
-	{
-		//movement_Array 
-		movement_Array[1].Enable = true;
-		movement_Array[1].Volume = 300;
-		movement_Array[1].StageNo = stage(movement_to_Stage_Array[1]);
-		movement_Array[1].GroupNo = group(1);
-		movement_Array[1].DirectionNo = E;
+	//void Set_Movement_Array()
+	//{
+	//	//movement_Array 
+	//	movement_Array[1].Enable = true;
+	//	movement_Array[1].Volume = 300;
+	//	movement_Array[1].StageNo = stage(movement_to_Stage_Array[1]);
+	//	movement_Array[1].GroupNo = group(1);
+	//	movement_Array[1].DirectionNo = E;
 
-		movement_Array[2].Enable = true;
-		movement_Array[2].Volume = 900;
-		movement_Array[2].StageNo = stage(movement_to_Stage_Array[2]);
-		movement_Array[2].GroupNo = group(2);
-		movement_Array[2].DirectionNo = E;
+	//	movement_Array[2].Enable = true;
+	//	movement_Array[2].Volume = 900;
+	//	movement_Array[2].StageNo = stage(movement_to_Stage_Array[2]);
+	//	movement_Array[2].GroupNo = group(2);
+	//	movement_Array[2].DirectionNo = E;
 
-		movement_Array[3].Enable = true;
-		movement_Array[3].Volume = 200;
-		movement_Array[3].StageNo = stage(movement_to_Stage_Array[3]);
-		movement_Array[3].GroupNo = group(2);
-		movement_Array[3].DirectionNo = E;
+	//	movement_Array[3].Enable = true;
+	//	movement_Array[3].Volume = 200;
+	//	movement_Array[3].StageNo = stage(movement_to_Stage_Array[3]);
+	//	movement_Array[3].GroupNo = group(2);
+	//	movement_Array[3].DirectionNo = E;
 
-		movement_Array[4].Enable = true;
-		movement_Array[4].Volume = 250;
-		movement_Array[4].StageNo = stage(movement_to_Stage_Array[4]);
-		movement_Array[4].GroupNo = group(1);
-		movement_Array[4].DirectionNo = W;
+	//	movement_Array[4].Enable = true;
+	//	movement_Array[4].Volume = 250;
+	//	movement_Array[4].StageNo = stage(movement_to_Stage_Array[4]);
+	//	movement_Array[4].GroupNo = group(1);
+	//	movement_Array[4].DirectionNo = W;
 
-		movement_Array[5].Enable = true;
-		movement_Array[5].Volume = 1000;
-		movement_Array[5].StageNo = stage(movement_to_Stage_Array[5]);
-		movement_Array[5].GroupNo = group(2);
-		movement_Array[5].DirectionNo = W;
+	//	movement_Array[5].Enable = true;
+	//	movement_Array[5].Volume = 1000;
+	//	movement_Array[5].StageNo = stage(movement_to_Stage_Array[5]);
+	//	movement_Array[5].GroupNo = group(2);
+	//	movement_Array[5].DirectionNo = W;
 
-		movement_Array[6].Enable = true;
-		movement_Array[6].Volume = 150;
-		movement_Array[6].StageNo = stage(movement_to_Stage_Array[6]);
-		movement_Array[6].GroupNo = group(2);
-		movement_Array[6].DirectionNo = W;
+	//	movement_Array[6].Enable = true;
+	//	movement_Array[6].Volume = 150;
+	//	movement_Array[6].StageNo = stage(movement_to_Stage_Array[6]);
+	//	movement_Array[6].GroupNo = group(2);
+	//	movement_Array[6].DirectionNo = W;
 
-		movement_Array[7].Enable = true;
-		movement_Array[7].Volume = 70;
-		movement_Array[7].StageNo = stage(movement_to_Stage_Array[7]);
-		movement_Array[7].GroupNo = group(1);
-		movement_Array[7].DirectionNo = N;
+	//	movement_Array[7].Enable = true;
+	//	movement_Array[7].Volume = 70;
+	//	movement_Array[7].StageNo = stage(movement_to_Stage_Array[7]);
+	//	movement_Array[7].GroupNo = group(1);
+	//	movement_Array[7].DirectionNo = N;
 
-		movement_Array[8].Enable = true;
-		movement_Array[8].Volume = 310;
-		movement_Array[8].StageNo = stage(movement_to_Stage_Array[8]);
-		movement_Array[8].GroupNo = group(2);
-		movement_Array[8].DirectionNo = N;
+	//	movement_Array[8].Enable = true;
+	//	movement_Array[8].Volume = 310;
+	//	movement_Array[8].StageNo = stage(movement_to_Stage_Array[8]);
+	//	movement_Array[8].GroupNo = group(2);
+	//	movement_Array[8].DirectionNo = N;
 
-		movement_Array[9].Enable = true;
-		movement_Array[9].Volume = 60;
-		movement_Array[9].StageNo = stage(movement_to_Stage_Array[9]);
-		movement_Array[9].GroupNo = group(2);
-		movement_Array[9].DirectionNo = N;
+	//	movement_Array[9].Enable = true;
+	//	movement_Array[9].Volume = 60;
+	//	movement_Array[9].StageNo = stage(movement_to_Stage_Array[9]);
+	//	movement_Array[9].GroupNo = group(2);
+	//	movement_Array[9].DirectionNo = N;
 
-		movement_Array[10].Enable = true;
-		movement_Array[10].Volume = 90;
-		movement_Array[10].StageNo = stage(movement_to_Stage_Array[10]);
-		movement_Array[10].GroupNo = group(1);
-		movement_Array[10].DirectionNo = S;
+	//	movement_Array[10].Enable = true;
+	//	movement_Array[10].Volume = 90;
+	//	movement_Array[10].StageNo = stage(movement_to_Stage_Array[10]);
+	//	movement_Array[10].GroupNo = group(1);
+	//	movement_Array[10].DirectionNo = S;
 
-		movement_Array[11].Enable = true;
-		movement_Array[11].Volume = 340;
-		movement_Array[11].StageNo = stage(movement_to_Stage_Array[11]);
-		movement_Array[11].GroupNo = group(2);
-		movement_Array[11].DirectionNo = S;
+	//	movement_Array[11].Enable = true;
+	//	movement_Array[11].Volume = 340;
+	//	movement_Array[11].StageNo = stage(movement_to_Stage_Array[11]);
+	//	movement_Array[11].GroupNo = group(2);
+	//	movement_Array[11].DirectionNo = S;
 
-		movement_Array[12].Enable = true;
-		movement_Array[12].Volume = 50;
-		movement_Array[12].StageNo = stage(movement_to_Stage_Array[12]);
-		movement_Array[12].GroupNo = group(2);
-		movement_Array[12].DirectionNo = S;
+	//	movement_Array[12].Enable = true;
+	//	movement_Array[12].Volume = 50;
+	//	movement_Array[12].StageNo = stage(movement_to_Stage_Array[12]);
+	//	movement_Array[12].GroupNo = group(2);
+	//	movement_Array[12].DirectionNo = S;
 
-	}
+	//}
 
 	void Set_Saturation_Flow_Rate_Matrix()
 	{
 		//movement_Array left turn movement
 		// we need to use the saturation flow rate values based on protected and permitted
 
-		saturation_Flow_Rate_Matrix[1][EBL] = 1750;
-		saturation_Flow_Rate_Matrix[1][WBL] = 1750;
-		saturation_Flow_Rate_Matrix[2][EBT] = 3400;
-		saturation_Flow_Rate_Matrix[2][EBR] = 3400;
-		saturation_Flow_Rate_Matrix[2][WBT] = 3400;
-		saturation_Flow_Rate_Matrix[2][WBR] = 3400;
-		saturation_Flow_Rate_Matrix[3][NBL] = 475;
-		saturation_Flow_Rate_Matrix[3][NBT] = 1800;
-		saturation_Flow_Rate_Matrix[3][NBR] = 1800;
-		saturation_Flow_Rate_Matrix[3][SBL] = 450;
-		saturation_Flow_Rate_Matrix[3][SBT] = 1800;
-		saturation_Flow_Rate_Matrix[3][SBR] = 1800;
+		for (size_t m = 1; m <= movement_Range; m++)
+		{
+			if (movement_Array[m].Left_Turn_Treatment == prot)
+			{
+				saturation_Flow_Rate_Matrix[movement_Array[m].StageNo][m] = 1530 * movement_Array[m].Lanes * PHF;
+			}
+			else if(movement_Array[m].Left_Turn_Treatment == perm)
+			{
+				int op_Movement_Index = left_Movement_Opposing_Index_Map[movement_Index(m)];
+				int op_volume = movement_Array[op_Movement_Index].Volume;
+				saturation_Flow_Rate_Matrix[movement_Array[m].StageNo][m] = f_1*f_2 * op_volume * (exp(-op_volume*4.5/3600))/(1-exp(op_volume * 2.5 / 3600));
+			}
+			else
+			{
+				saturation_Flow_Rate_Matrix[movement_Array[m].StageNo][m] = 1800;//temp!!
+			}
+		}
+
+		//saturation_Flow_Rate_Matrix[1][EBL] = 1750;
+		//saturation_Flow_Rate_Matrix[1][WBL] = 1750;
+		//saturation_Flow_Rate_Matrix[2][EBT] = 3400;
+		//saturation_Flow_Rate_Matrix[2][EBR] = 3400;
+		//saturation_Flow_Rate_Matrix[2][WBT] = 3400;
+		//saturation_Flow_Rate_Matrix[2][WBR] = 3400;
+		//saturation_Flow_Rate_Matrix[3][NBL] = 475;
+		//saturation_Flow_Rate_Matrix[3][NBT] = 1800;
+		//saturation_Flow_Rate_Matrix[3][NBR] = 1800;
+		//saturation_Flow_Rate_Matrix[3][SBL] = 450;
+		//saturation_Flow_Rate_Matrix[3][SBT] = 1800;
+		//saturation_Flow_Rate_Matrix[3][SBR] = 1800;
 	}
 #pragma endregion
 
@@ -856,10 +1129,12 @@ public:
 		cumulative_green_start_time_Stage_Array[1] = 0;
 		cumulative_green_end_time_Stage_Array[1] = green_Time_Stage_Array[1];
 
+		cout << "stage no 1: " << green_Time_Stage_Array[1] << endl;
+
 
 		for (size_t i = 2; i <= stage_Range; i++)
 		{
-			cout << green_Time_Stage_Array[i] << endl;
+			cout << "stage no " << i << ": " << green_Time_Stage_Array[i] << endl;
 			cumulative_green_start_time_Stage_Array[i] = cumulative_green_end_time_Stage_Array[i - 1];
 			cumulative_green_end_time_Stage_Array[i] = cumulative_green_start_time_Stage_Array[i] + green_Time_Stage_Array[i];
 		}
@@ -1196,6 +1471,9 @@ void g_ReadInputData(CMainModual& MainModual)
 			string movement_str;
 			parser_link.GetValueByFieldName("movement_str", movement_str);
 
+			int lanes;
+			parser_link.GetValueByFieldName("lanes", lanes);
+
 			if (movement_str.size() > 0)  // and valid
 			{
 				int main_node_id = -1;
@@ -1211,7 +1489,7 @@ void g_ReadInputData(CMainModual& MainModual)
 
 				if(main_node_id>=1)
 				{
-					g_signal_node_map[main_node_id].AddMovementVolume(link.link_seq_no, movement_str, initial_volume);
+					g_signal_node_map[main_node_id].AddMovementVolume(link.link_seq_no, movement_str, initial_volume,lanes);
 				}
 			}
 
@@ -1231,7 +1509,7 @@ void g_ReadInputData(CMainModual& MainModual)
 double SignalAPI(int iteration_number, int MainModual_mode, int column_updating_iterations)
 {
 
-// step 1: read input data of network / demand tables / Toll
+	// step 1: read input data of network / demand tables / Toll
 	g_ReadInputData(MainModual);
 
 	for (std::map<int, CSignalNode>::iterator it = g_signal_node_map.begin(); it != g_signal_node_map.end(); ++it)
@@ -1253,21 +1531,20 @@ double SignalAPI(int iteration_number, int MainModual_mode, int column_updating_
 	else
 	{
 
-		
-		fprintf(g_pFileServiceArc, "from_node_id,to_node_id,time_window,time_interval,travel_time_delta,capacity\n");
+
+		fprintf(g_pFileServiceArc, "road_link_id,from_node_id,to_node_id,time_window,time_interval,travel_time_delta,capacity,cycle_no,cycle_length,main_node_id,stage,movement_str,\n");
 
 		for (std::map<int, CSignalNode>::iterator it = g_signal_node_map.begin(); it != g_signal_node_map.end(); ++it)
 		{
 			CSignalNode sn = it->second;
 
-			int cycle_time_in_sec = max(10,sn.c_Min);
+			int cycle_time_in_sec = max(10, sn.c_Min);
 			int number_of_cycles = (MainModual.g_LoadingEndTimeInMin - MainModual.g_LoadingStartTimeInMin) * 60 / cycle_time_in_sec;  // unit: seconds;
 			int offset_in_sec = 0;
 			int g_loading_start_time_in_sec = MainModual.g_LoadingStartTimeInMin * 60 + offset_in_sec;
-			for (int ci = 0; ci <= number_of_cycles; ci++)
-			{
+			int ci = 0;
 
-				for (int m = 1; m < movementSize; m++)
+			for (int m = 1; m < movementSize; m++)
 				{
 					if (sn.movement_Array[m].Enable)
 					{
@@ -1288,8 +1565,10 @@ double SignalAPI(int iteration_number, int MainModual_mode, int column_updating_
 
 						int from_node_id = g_node_vector[g_link_vector[sn.movement_Array[m].LinkSeqNo].from_node_seq_no].node_id;
 						int to_node_id = g_node_vector[g_link_vector[sn.movement_Array[m].LinkSeqNo].to_node_seq_no].node_id;
-						float capacity = sn.green_Time_Stage_Array[StageNo] * sn.saturation_Flow_Rate_Matrix[StageNo][m] / 3600.0;
-						fprintf(g_pFileServiceArc, "%d,%d,%02d%02d:%02d_%02d%02d:%02d,-1,-1,%f\n",
+						//						float capacity = sn.green_Time_Stage_Array[StageNo] * sn.saturation_Flow_Rate_Matrix[StageNo][m] / 3600.0;
+						float capacity = sn.green_Time_Stage_Array[StageNo] * 1800.0 / 3600.0;
+						fprintf(g_pFileServiceArc, "%s,%d,%d,%02d%02d:%02d_%02d%02d:%02d,-1,-1,%f,%d,%d,%d,%d,%s\n",
+							g_link_vector[sn.movement_Array[m].LinkSeqNo].link_id.c_str(),
 							from_node_id,
 							to_node_id,
 							start_hour,
@@ -1298,15 +1577,20 @@ double SignalAPI(int iteration_number, int MainModual_mode, int column_updating_
 							end_hour,
 							end_min,
 							end_sec,
-							capacity
+							capacity,
+							ci,
+							cycle_time_in_sec,
+							it->first,
+							StageNo,
+							sn.movement_str_array[m].c_str()
 						);
 
 					}  // per movement
 
-				}
-			}  // per cycle
+			}
+			
 		}  // per signal node
-	
+
 		fclose(g_pFileServiceArc);
 	}
 
