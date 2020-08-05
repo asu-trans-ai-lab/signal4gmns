@@ -43,6 +43,7 @@ template <typename T>
 
 FILE* g_pFileOutputLog = NULL;
 int g_debugging_flag = 2;
+string g_info_String = "";
 
 
 void fopen_ss(FILE **file, const char *fileName, const char *mode)
@@ -380,6 +381,18 @@ public:
 		b_debug_detail_flag = 1;
 
 		g_pFileDebugLog = NULL;
+		g_informationCount = 0;
+
+
+		SYSTEMTIME st;
+		GetLocalTime(&st);
+		g_pFileDebugLog = fopen("log.txt", "at");
+		fprintf(g_pFileDebugLog, "Logging Time: %d/%d/%d_%d:%d:%d:%d---------------------------------------\n",st.wYear,st.wMonth,st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+		fclose(g_pFileDebugLog);
+		messageType_int_to_string[0] = "MSG";//message
+		messageType_int_to_string[1] = "OUT";//output
+		messageType_int_to_string[2] = "WAR";//Warning
+
 	}
 
 	int b_debug_detail_flag;
@@ -396,9 +409,58 @@ public:
 
 	int g_LoadingStartTimeInMin;
 	int g_LoadingEndTimeInMin;
+	int g_informationCount;
 
-	FILE* g_pFileDebugLog = NULL;
+	FILE* g_pFileDebugLog;
+	std::map<int, char*> messageType_int_to_string;
 
+	void WriteLog(int messageType, string info, int level)
+	{
+		string padding = "";
+		if (level > 1)
+		{
+			for (size_t l = 2; l <= level; l++)
+			{
+				padding.append("--");
+			}
+		}
+		if (level == -1)
+		{
+			padding = "+++++++++++++++";
+		}
+		if (level == -2)
+		{
+			padding = "+++++++++++++++";
+		}
+
+		g_pFileDebugLog = fopen("log.txt", "at");
+		fprintf(g_pFileDebugLog, "Info_ID: %d| Info_Type: %s \t| Info: %s%s\n",  g_informationCount, messageType_int_to_string[messageType], padding.c_str(), info.c_str());
+		fclose(g_pFileDebugLog);
+		cout << "Info_ID: " << g_informationCount << "| Info_Type: " << messageType_int_to_string[messageType] << " \t| Info: "<< padding.c_str()  << info.c_str() << endl;
+		//OutputDebugStringA(szLog);
+		g_informationCount++;
+	}
+
+	string Output_Combine_Message_And_Value_Int(string info,int value)
+	{
+		string value_String = to_string(value);
+
+		info.append(": ");
+
+		info.append(value_String);
+
+		return info;
+	}
+	string Output_Combine_Message_And_Value_Double(string info, double value)
+	{
+		string value_String = to_string(value);
+
+		info.append(": ");
+
+		info.append(value_String);
+
+		return info;
+	}
 
 };
 
@@ -504,7 +566,7 @@ struct SMovementData
 
 
 	//by Acquisition through processing
-	int Assignment_Order;// Differentiate primary and secondary movements, then determine stages  according to volumes
+	int Assignment_Order;// not in use, Differentiate primary and secondary movements, then determine stages  according to volumes
 	enum left_Turn_Treatment Left_Turn_Treatment;
 
 };
@@ -523,7 +585,7 @@ enum movement_Index { EBL = 1, EBT = 2, EBR = 3, WBL = 4, WBT = 5, WBR = 6, NBL 
 enum stage { stage1 = 1, stage2 = 2, stage3 = 3, stage4 = 4 };
 enum direction { E = 1, W = 2, N = 3, S = 4 };
 enum group { L = 1, T_AND_R = 2 };
-enum left_Turn_Treatment { prot = 0, perm = 1, no_business = -1 };
+enum left_Turn_Treatment { perm = 0, prot = 1, no_business = -1 };
 
 //array size, for constructing matirx or array
 const int laneColumnSize = 32;
@@ -539,10 +601,13 @@ const int groupSize = 5;
 //parameters
 double l = 12;
 double x_c_Input = 0.9;
-double PHF = 0.9;
+double PHF = 1;
 
 double f_1 = 1;
 double f_2 = 1;
+double t_L = 4;
+double t_Yellow = 4;
+double t_AR = 2;
 
 #pragma endregion
 
@@ -611,7 +676,7 @@ public:
 		left_Movement_Opposing_Index_Map[NBL] = SBT;
 		left_Movement_Opposing_Index_Map[SBL] = NBT;
 
-		
+
 		left_Movement_Counterpart_Index_Map[EBL] = EBT;
 		left_Movement_Counterpart_Index_Map[WBL] = WBT;
 		left_Movement_Counterpart_Index_Map[NBL] = NBT;
@@ -631,6 +696,20 @@ public:
 		movement_Index_to_Group_Map[SBT] = group(2);
 		movement_Index_to_Group_Map[SBR] = group(2);
 
+		direction_index_to_str_map[E] = "E";
+		direction_index_to_str_map[W] = "W";
+		direction_index_to_str_map[N] = "N";
+		direction_index_to_str_map[S] = "S";
+
+		intersection_Average_Delay = 0;
+		intersection_Total_Delay = 0;
+		intersection_Total_Volume = 0;
+
+		left_Turn_Treatment_index_to_str_map[prot] = "Protected";
+		left_Turn_Treatment_index_to_str_map[perm] = "Permissive";
+		left_Turn_Treatment_index_to_str_map[no_business] = "Null";
+
+
 		for (int s = 0; s <= stageSize; s++)
 		{
 			y_Max_Stage_Array[s] = 0;
@@ -638,23 +717,35 @@ public:
 			for (int m = 0; m <= movementSize; m++)
 			{
 				saturation_Flow_Rate_Matrix[s][m] = 0;
+				capacity_by_Stage_and_Movement_Matrix[s][m] = 0;
 			}
 
 			for (int d = 0; d <= directionSize; d++)
+			{
 				for (int g = 0; g <= groupSize; g++)
 				{
 					stage_Direction_Candidates_Matrix[s][d][g] = 0;
+
 				}
+				approach_Average_Delay_Array[d] = 0;
+				approach_Total_Delay_Array[d] = 0;
+				approach_Total_Volume_Array[d] = 0;
+			}
 
 		}
 	}
-	int movement_Range = 12;
-	int stage_Range;
 
-	std::map<string, movement_Index> movement_str_to_index_map;
+	int movement_Range = 12;
+	int direction_Range = 4;
+
+	std::map<string, enum movement_Index> movement_str_to_index_map;
+	std::map<enum direction, string > direction_index_to_str_map;
+	std::map<enum left_Turn_Treatment, string > left_Turn_Treatment_index_to_str_map;
+
+
 	string movement_str_array[movementSize + 1];
 		
-	std::map<string, direction> movement_str_to_direction_map;
+	std::map<string, enum direction> movement_str_to_direction_map;
 
 	std::map<enum movement_Index, enum movement_Index> left_Movement_Opposing_Index_Map;
 
@@ -670,16 +761,28 @@ public:
 	int green_End_Stage_Array[stageSize+1];
 	double y_Max_Stage_Array[stageSize+1];
 	double green_Time_Stage_Array[stageSize + 1];
-	double cumulative_green_start_time_Stage_Array[stageSize + 1];
-	double cumulative_green_end_time_Stage_Array[stageSize + 1];
+	double cumulative_Green_Start_Time_Stage_Array[stageSize + 1];
+	double cumulative_Green_End_Time_Stage_Array[stageSize + 1];
+	double effective_Green_Time_Stage_Array[stageSize + 1];
+	double cumulative_Effective_Green_Start_Time_Stage_Array[stageSize + 1];
+	double cumulative_Effective_Green_End_Time_Stage_Array[stageSize + 1];
+	double ratio_of_Effective_Green_Time_to_Cycle_Length_Array[stageSize + 1];
 
+	double approach_Average_Delay_Array[directionSize+1];
+	double approach_Total_Delay_Array[directionSize + 1];
+	double approach_Total_Volume_Array[directionSize + 1];
 
 
 
 	//matrix
-	int saturation_Flow_Rate_Matrix[stageSize+1][movementSize + 1];//s
+	double saturation_Flow_Rate_Matrix[stageSize+1][movementSize + 1];//s
 	double y_Stage_Movement_Matrix[stageSize + 1][movementSize + 1];
 	double stage_Direction_Candidates_Matrix[stageSize + 1][directionSize + 1][groupSize + 1];
+
+	double capacity_by_Stage_and_Movement_Matrix[stageSize + 1][movementSize + 1];
+	double v_over_C_by_Stage_and_Movement_Matrix[stageSize + 1][movementSize + 1];
+
+	double average_Uniform_Delay_Matrix[stageSize + 1][movementSize + 1];
 
 
 	int NEMA_Phase_Matrix[5][3] = { 0,0,0,0,1,5,0,2,6,0,3,7,0,4,8 };//row->NEMA_phases; col->rings
@@ -688,12 +791,65 @@ public:
 	SMovementData Stage_Ring_Movement_Matrix[ringSize + 1][stageSize + 1];
 
 	//variables
-
+	int stage_Range;
 	double y_StageMax;
 	double x_c_output;
 	double c_Min;
+	double c_Optimal;
 
-	void AddMovementVolume(int link_seq_no, string str, float volume,int lanes)
+	double intersection_Average_Delay;
+	double intersection_Total_Delay;
+	double intersection_Total_Volume;
+
+	string LOS;
+
+	void PerformQEM(int nodeID)
+	{
+		MainModual.WriteLog(0, "Step 2: Perform QEM", 1);
+
+		MainModual.WriteLog(0, "Step 2.1: Set Left Turn Treatments",2);
+		Set_Left_Turn_Treatment();
+
+		MainModual.WriteLog(0, "Step 2.2: Set StageNos",2);
+		Set_StageNo_for_Movements(); 
+
+		MainModual.WriteLog(0, "Step 2.3: Set Saturation Flow Rate Matrix",2);
+		Set_Saturation_Flow_Rate_Matrix(); 
+
+		MainModual.WriteLog(0, "Step 2.4: Calculate Flow Ratio",2);
+		Calculate_Flow_of_Ratio_Max();
+		MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double("Max y Value", y_StageMax),3);
+
+		MainModual.WriteLog(0, "Step 2.5: Calculate Total Cycle Lost Time", 2);
+		Calculate_Total_Cycle_Lost_Time();
+		MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double("Total Cycle Lost Time", l), 3);
+
+		MainModual.WriteLog(0, "Step 2.6: Calculate the Minimum and Optimal Cycle Length",2);
+		Calculate_the_Minimum_And_Optimal_Cycle_Length();
+		MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double("Min Cycle Length", c_Min),3);
+		MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double("Optimal Cycle Length", c_Optimal), 3);
+
+
+		MainModual.WriteLog(0, "Step 2.7: Recalculate xc",2);
+		Calculate_the_x_c_Output();
+		MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double("Recalculated xc", x_c_output),3);
+
+		MainModual.WriteLog(0, "Step 2.8: Timing for Stages",2);
+		Calculate_Green_Time_for_Stages();
+		Printing_Green_Time_for_Stages();
+
+		MainModual.WriteLog(0, "Step 2.9: Calculate capacity and ratio V/C", 2);
+		Calculate_Capacity_And_Ratio_V_over_C();
+
+		MainModual.WriteLog(0, "Step 2.10: Calculate Signal Delay", 2);
+		Calculate_Signal_Delay(nodeID);
+
+		MainModual.WriteLog(0, "Step 2.11: Judge LOS", 2);
+		Judge_Signal_LOS(nodeID);
+	}
+
+
+	void AddMovementVolume(int link_seq_no, string str, float volume, int lanes)
 	{
 		enum movement_Index mi = movement_str_to_index_map[str];
 		enum direction di = movement_str_to_direction_map[str];
@@ -718,22 +874,22 @@ public:
 			int final_decision;
 			if (movement_Array[m].GroupNo == 1)
 			{
-				final_decision = 1;
+				final_decision = 0;
 				//(1)	Left-turn Lane Check
 				if (movement_Array[m].Lanes > 1)
 				{
-					final_decision = 0;
+					final_decision = 1;
 				}
 				//(2)	Minimum Volume Check
 				if (movement_Array[m].Volume >= 240)
 				{
-					final_decision = 0;
+					final_decision = 1;
 				}
 				//(3)	Opposing Through Lanes Check
 				int op_Movement_Index = left_Movement_Opposing_Index_Map[movement_Index(m)];
 				if (movement_Array[op_Movement_Index].Lanes >= 4)
 				{
-					final_decision = 0;
+					final_decision = 1;
 				}
 				//(4)	Opposing Traffic Speed Check
 
@@ -743,7 +899,7 @@ public:
 				{
 					if (movement_Array[co_Movement_Index].Volume * movement_Array[m].Volume >= 100000)
 					{
-						final_decision = 0;
+						final_decision = 1;
 					}
 				}
 				else
@@ -751,7 +907,7 @@ public:
 
 					if (movement_Array[co_Movement_Index].Volume * movement_Array[m].Volume >= 50000)
 					{
-						final_decision = 0;
+						final_decision = 1;
 					}
 				}
 			}
@@ -760,41 +916,17 @@ public:
 				final_decision = -1;
 			}
 			movement_Array[m].Left_Turn_Treatment = left_Turn_Treatment(final_decision);
+
+			if (final_decision != -1)
+			{
+				g_info_String = "Left Turn Treatment of Movement_";
+				g_info_String.append(movement_str_array[m]);
+				g_info_String.append(": ");
+				g_info_String.append(left_Turn_Treatment_index_to_str_map[left_Turn_Treatment(final_decision)]);
+				MainModual.WriteLog(1, g_info_String, 3);
+			}
+
 		}
-	}
-
-	void PerformQEM()
-	{
-		// step 1: decide protected or not
-
-		Set_Left_Turn_Treatment();
-
-		// step 2: set stages
-
-		Set_StageNo_for_Movements();   // change position
-
-
-		//step 3: set saturation flow rate matrix
-
-		Set_Saturation_Flow_Rate_Matrix(); 
-
-		//step 4: Calculating Flow Ratio
-		cout << "Calculating Flow Ratio \n";
-		Calculating_Flow_of_Ratio_Max();
-		cout << y_StageMax << endl;
-
-		cout << "Calculating the Minimum Cycle Length \n";
-		Calculating_the_Minimum_Cycle_Length();
-		cout << c_Min << endl;
-
-		cout << "ReCalculating xc \n";
-		Calculating_the_x_c_Output();
-		cout << x_c_output << endl;
-
-		cout << "Timing for Stages \n";
-		Calculating_Green_Time_for_Stages();
-		Printing_Green_Time_for_Stages();
-
 	}
 
 	void Set_StageNo_for_Movements()
@@ -833,6 +965,9 @@ public:
 			north_And_South_Flag = true;
 
 		}
+		g_info_String = "Number of Stages: ";
+		g_info_String.append(to_string(stage_Range));
+		MainModual.WriteLog(1, g_info_String, 3);
 		enum movement_Index firstL;
 		enum movement_Index firstT;
 		enum movement_Index firstR;
@@ -860,6 +995,7 @@ public:
 			fouthL = SBL;
 			fouthT = SBT;
 			fouthR = SBR;
+			MainModual.WriteLog(0, "Main Approaches: E & W", 3);
 		}
 		else
 		{
@@ -876,6 +1012,8 @@ public:
 			fouthL = WBL;
 			fouthT = WBT;
 			fouthR = WBR;
+			MainModual.WriteLog(0, "Main Approaches: N & S", 3);
+
 		}
 
 
@@ -947,85 +1085,16 @@ public:
 		//movement_Array[SBL].StageNo = stage3;
 		//movement_Array[SBT].StageNo = stage3;
 		//movement_Array[SBR].StageNo = stage3;
+		for (size_t m = 1; m <= movement_Range; m++)
+		{
+			g_info_String = "StageNo of Movement_";
+			g_info_String.append(movement_str_array[m]);
+			g_info_String.append(": ");
+			g_info_String.append("Stage_");
+			g_info_String.append(to_string(movement_Array[m].StageNo));
+			MainModual.WriteLog(1, g_info_String, 4);
+		}
 	}
-
-
-	//void Set_Movement_Array()
-	//{
-	//	//movement_Array 
-	//	movement_Array[1].Enable = true;
-	//	movement_Array[1].Volume = 300;
-	//	movement_Array[1].StageNo = stage(movement_to_Stage_Array[1]);
-	//	movement_Array[1].GroupNo = group(1);
-	//	movement_Array[1].DirectionNo = E;
-
-	//	movement_Array[2].Enable = true;
-	//	movement_Array[2].Volume = 900;
-	//	movement_Array[2].StageNo = stage(movement_to_Stage_Array[2]);
-	//	movement_Array[2].GroupNo = group(2);
-	//	movement_Array[2].DirectionNo = E;
-
-	//	movement_Array[3].Enable = true;
-	//	movement_Array[3].Volume = 200;
-	//	movement_Array[3].StageNo = stage(movement_to_Stage_Array[3]);
-	//	movement_Array[3].GroupNo = group(2);
-	//	movement_Array[3].DirectionNo = E;
-
-	//	movement_Array[4].Enable = true;
-	//	movement_Array[4].Volume = 250;
-	//	movement_Array[4].StageNo = stage(movement_to_Stage_Array[4]);
-	//	movement_Array[4].GroupNo = group(1);
-	//	movement_Array[4].DirectionNo = W;
-
-	//	movement_Array[5].Enable = true;
-	//	movement_Array[5].Volume = 1000;
-	//	movement_Array[5].StageNo = stage(movement_to_Stage_Array[5]);
-	//	movement_Array[5].GroupNo = group(2);
-	//	movement_Array[5].DirectionNo = W;
-
-	//	movement_Array[6].Enable = true;
-	//	movement_Array[6].Volume = 150;
-	//	movement_Array[6].StageNo = stage(movement_to_Stage_Array[6]);
-	//	movement_Array[6].GroupNo = group(2);
-	//	movement_Array[6].DirectionNo = W;
-
-	//	movement_Array[7].Enable = true;
-	//	movement_Array[7].Volume = 70;
-	//	movement_Array[7].StageNo = stage(movement_to_Stage_Array[7]);
-	//	movement_Array[7].GroupNo = group(1);
-	//	movement_Array[7].DirectionNo = N;
-
-	//	movement_Array[8].Enable = true;
-	//	movement_Array[8].Volume = 310;
-	//	movement_Array[8].StageNo = stage(movement_to_Stage_Array[8]);
-	//	movement_Array[8].GroupNo = group(2);
-	//	movement_Array[8].DirectionNo = N;
-
-	//	movement_Array[9].Enable = true;
-	//	movement_Array[9].Volume = 60;
-	//	movement_Array[9].StageNo = stage(movement_to_Stage_Array[9]);
-	//	movement_Array[9].GroupNo = group(2);
-	//	movement_Array[9].DirectionNo = N;
-
-	//	movement_Array[10].Enable = true;
-	//	movement_Array[10].Volume = 90;
-	//	movement_Array[10].StageNo = stage(movement_to_Stage_Array[10]);
-	//	movement_Array[10].GroupNo = group(1);
-	//	movement_Array[10].DirectionNo = S;
-
-	//	movement_Array[11].Enable = true;
-	//	movement_Array[11].Volume = 340;
-	//	movement_Array[11].StageNo = stage(movement_to_Stage_Array[11]);
-	//	movement_Array[11].GroupNo = group(2);
-	//	movement_Array[11].DirectionNo = S;
-
-	//	movement_Array[12].Enable = true;
-	//	movement_Array[12].Volume = 50;
-	//	movement_Array[12].StageNo = stage(movement_to_Stage_Array[12]);
-	//	movement_Array[12].GroupNo = group(2);
-	//	movement_Array[12].DirectionNo = S;
-
-	//}
 
 	void Set_Saturation_Flow_Rate_Matrix()
 	{
@@ -1038,16 +1107,24 @@ public:
 			{
 				saturation_Flow_Rate_Matrix[movement_Array[m].StageNo][m] = 1530 * movement_Array[m].Lanes * PHF;
 			}
-			else if(movement_Array[m].Left_Turn_Treatment == perm)
+			else if (movement_Array[m].Left_Turn_Treatment == perm)
 			{
 				int op_Movement_Index = left_Movement_Opposing_Index_Map[movement_Index(m)];
 				int op_volume = movement_Array[op_Movement_Index].Volume;
-				saturation_Flow_Rate_Matrix[movement_Array[m].StageNo][m] = f_1*f_2 * op_volume * (exp(-op_volume*4.5/3600))/(1-exp(op_volume * 2.5 / 3600));
+				saturation_Flow_Rate_Matrix[movement_Array[m].StageNo][m] = f_1 * f_2 * op_volume * (exp(-op_volume * 4.5 / 3600)) / (1 - exp(op_volume * 2.5 / 3600));
 			}
 			else
 			{
-				saturation_Flow_Rate_Matrix[movement_Array[m].StageNo][m] = 1800;//temp!!
+				saturation_Flow_Rate_Matrix[movement_Array[m].StageNo][m] = 1530 * movement_Array[m].Lanes;//temp!!
 			}
+			g_info_String = "Saturation Flow Rate of Movement_";
+			g_info_String.append(movement_str_array[m]);
+			g_info_String.append(" and ");
+			g_info_String.append("Stage_");
+			g_info_String.append(to_string(movement_Array[m].StageNo));
+			g_info_String.append(": ");
+			g_info_String.append(to_string(saturation_Flow_Rate_Matrix[movement_Array[m].StageNo][m]));
+			MainModual.WriteLog(1, g_info_String, 3);
 		}
 
 		//saturation_Flow_Rate_Matrix[1][EBL] = 1750;
@@ -1063,11 +1140,8 @@ public:
 		//saturation_Flow_Rate_Matrix[3][SBT] = 1800;
 		//saturation_Flow_Rate_Matrix[3][SBR] = 1800;
 	}
-#pragma endregion
 
-#pragma region Private_Methods
-
-	void Calculating_Flow_of_Ratio_Max()
+	void Calculate_Flow_of_Ratio_Max()
 	{
 		//y_Stage_Movement_Matrix
 		//y_StageMax
@@ -1101,50 +1175,286 @@ public:
 
 	}
 
-
-	void Calculating_the_Minimum_Cycle_Length()
+	void Calculate_Total_Cycle_Lost_Time()
 	{
-		c_Min = max(60, (l - x_c_Input) / (x_c_Input - y_StageMax));
+		l = t_L * stage_Range;
 	}
 
-	void Calculating_the_x_c_Output()
+	void Calculate_the_Minimum_And_Optimal_Cycle_Length()
+	{
+		c_Min = max(60, (l - x_c_Input) / (x_c_Input - y_StageMax));
+		c_Optimal= max(60, (1.5*l +5) / (1 - y_StageMax));
+	}
+
+	void Calculate_the_x_c_Output()
 	{
 		x_c_output = (y_StageMax * c_Min) / (c_Min - l);
 	}
 
-
-	void Calculating_Green_Time_for_Stages()
+	void Calculate_Green_Time_for_Stages()
 	{
 		for (size_t i = 1; i <= stage_Range; i++)
 		{
 //			green_Time_Stage_Array[i] = y_Max_Stage_Array[i] * c_Min / x_c_output;
 			green_Time_Stage_Array[i] = y_Max_Stage_Array[i] * c_Min / y_StageMax;
-
-			
+			effective_Green_Time_Stage_Array[i] = green_Time_Stage_Array[i] - t_L + t_Yellow + t_AR;
+			ratio_of_Effective_Green_Time_to_Cycle_Length_Array[i] = effective_Green_Time_Stage_Array[i] / c_Min;
 		}
 	}
 
-	void Printing_Green_Time_for_Stages()
+	void Printing_Green_Time_for_Stages()//output Effective green time 
 	{
-		cumulative_green_start_time_Stage_Array[1] = 0;
-		cumulative_green_end_time_Stage_Array[1] = green_Time_Stage_Array[1];
-
-		cout << "stage no 1: " << green_Time_Stage_Array[1] << endl;
+		cumulative_Green_Start_Time_Stage_Array[1] = 0;
+		cumulative_Green_End_Time_Stage_Array[1] = green_Time_Stage_Array[1];
+		MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double("Green Time of Stage 1", green_Time_Stage_Array[1]),3);
+		MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double("Start Green Time of Stage 1", cumulative_Green_Start_Time_Stage_Array[1]), 4);
+		MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double("End Green Time of Stage 1", cumulative_Green_End_Time_Stage_Array[1]), 4);
 
 
 		for (size_t i = 2; i <= stage_Range; i++)
 		{
-			cout << "stage no " << i << ": " << green_Time_Stage_Array[i] << endl;
-			cumulative_green_start_time_Stage_Array[i] = cumulative_green_end_time_Stage_Array[i - 1];
-			cumulative_green_end_time_Stage_Array[i] = cumulative_green_start_time_Stage_Array[i] + green_Time_Stage_Array[i];
+			g_info_String = "Green Time of Stage ";
+			g_info_String.append(to_string(i));
+			MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double(g_info_String, green_Time_Stage_Array[i]),3);
+			cumulative_Green_Start_Time_Stage_Array[i] = cumulative_Green_End_Time_Stage_Array[i - 1];
+			cumulative_Green_End_Time_Stage_Array[i] = cumulative_Green_Start_Time_Stage_Array[i] + green_Time_Stage_Array[i];
+
+			g_info_String = "Start Green Time of Stage ";
+			g_info_String.append(to_string(i));
+			MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double(g_info_String, cumulative_Green_Start_Time_Stage_Array[i]), 4);
+
+			g_info_String = "End Green Time of Stage ";
+			g_info_String.append(to_string(i));
+			MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double(g_info_String, cumulative_Green_End_Time_Stage_Array[i]), 4);
+		}
+
+
+
+		cumulative_Effective_Green_Start_Time_Stage_Array[1] = 0;
+		cumulative_Effective_Green_End_Time_Stage_Array[1] = effective_Green_Time_Stage_Array[1];
+
+		MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double("Effective Green Time of Stage 1", effective_Green_Time_Stage_Array[1]), 3);
+		MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double("Start Effective Green Time of Stage 1", cumulative_Effective_Green_Start_Time_Stage_Array[1]), 4);
+		MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double("End Effective Green Time of Stage 1", cumulative_Effective_Green_End_Time_Stage_Array[1]), 4);
+
+
+		for (size_t i = 2; i <= stage_Range; i++)
+		{
+			g_info_String = "Effective Green Time of Stage ";
+			g_info_String.append(to_string(i));
+			MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double(g_info_String, effective_Green_Time_Stage_Array[i]), 3);
+			cumulative_Effective_Green_Start_Time_Stage_Array[i] = cumulative_Effective_Green_End_Time_Stage_Array[i - 1];
+			cumulative_Effective_Green_End_Time_Stage_Array[i] = cumulative_Effective_Green_Start_Time_Stage_Array[i] + effective_Green_Time_Stage_Array[i];
+
+			g_info_String = "Start Effective Green Time of Stage ";
+			g_info_String.append(to_string(i));
+			MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double(g_info_String, cumulative_Effective_Green_Start_Time_Stage_Array[i]), 4);
+
+			g_info_String = "End Effective Green Time of Stage ";
+			g_info_String.append(to_string(i));
+			MainModual.WriteLog(1, MainModual.Output_Combine_Message_And_Value_Double(g_info_String, cumulative_Effective_Green_End_Time_Stage_Array[i]), 4);
 		}
 	}
 
+	void Calculate_Capacity_And_Ratio_V_over_C()
+	{
+		for (size_t s = 1; s <= stage_Range; s++)
+		{
+			for (size_t m = 1; m <= movement_Range; m++)
+			{
+				if (saturation_Flow_Rate_Matrix[s][m] != 0)
+				{
+					capacity_by_Stage_and_Movement_Matrix[s][m] = saturation_Flow_Rate_Matrix[s][m] * ratio_of_Effective_Green_Time_to_Cycle_Length_Array[s];
+					g_info_String = "a. Capacity of Stage_";
+					g_info_String.append(to_string(s));
+					g_info_String.append(" and Movement_");
+					g_info_String.append(movement_str_array[m]);
+					g_info_String.append(": ");
+					g_info_String.append(to_string(capacity_by_Stage_and_Movement_Matrix[s][m]));
+					MainModual.WriteLog(1, g_info_String, 3);
+					v_over_C_by_Stage_and_Movement_Matrix[s][m] = movement_Array[m].Volume / capacity_by_Stage_and_Movement_Matrix[s][m];
+					g_info_String = "b. V/C of Stage_";
+					g_info_String.append(to_string(s));
+					g_info_String.append(" and Movement_");
+					g_info_String.append(movement_str_array[m]);
+					g_info_String.append(": ");
+					g_info_String.append(to_string(v_over_C_by_Stage_and_Movement_Matrix[s][m]));
+					MainModual.WriteLog(1, g_info_String, 3);
+				}
+			}
+		}
+	}
+
+	void Calculate_Signal_Delay(int nodeID)
+	{
+		for (size_t s = 1; s <= stage_Range; s++)
+		{
+			for (size_t m = 1; m <= movement_Range; m++)
+			{
+				if (saturation_Flow_Rate_Matrix[s][m] != 0)
+				{
+					average_Uniform_Delay_Matrix[s][m] = (0.5 * capacity_by_Stage_and_Movement_Matrix[s][m] * pow((1 - ratio_of_Effective_Green_Time_to_Cycle_Length_Array[s]), 2)) / (1 - v_over_C_by_Stage_and_Movement_Matrix[s][m] * ratio_of_Effective_Green_Time_to_Cycle_Length_Array[s]);
+
+					//(2)	Average Incremental Delay          next time 
+					g_info_String = "Average Uniform Delay of Stage_";
+					g_info_String.append(to_string(s));
+					g_info_String.append(" and Movement_");
+					g_info_String.append(movement_str_array[m]);
+					g_info_String.append(": ");
+					g_info_String.append(to_string(average_Uniform_Delay_Matrix[s][m]));
+					MainModual.WriteLog(1, g_info_String, 3);
+
+
+					approach_Total_Delay_Array[movement_Array[m].DirectionNo] += movement_Array[m].Volume * average_Uniform_Delay_Matrix[s][m];
+					approach_Total_Volume_Array[movement_Array[m].DirectionNo] += movement_Array[m].Volume;
+				}
+			}
+		}
+		for (size_t d = 1; d <= direction_Range; d++)
+		{
+			approach_Average_Delay_Array[d] = approach_Total_Delay_Array[d] / approach_Total_Volume_Array[d];
+			g_info_String = "Average Delay of Approach_";
+			g_info_String.append(direction_index_to_str_map[direction(d)]);
+			g_info_String.append(": ");
+			g_info_String.append(to_string(approach_Average_Delay_Array[d]));
+			MainModual.WriteLog(1, g_info_String, 3);
+
+
+
+			intersection_Total_Delay += approach_Average_Delay_Array[d] * approach_Total_Volume_Array[d];
+			intersection_Total_Volume += approach_Total_Volume_Array[d];
+		}
+		intersection_Average_Delay = intersection_Total_Delay / intersection_Total_Volume;
+
+		g_info_String = "Total Delay of Intersection_NodeID_";
+		g_info_String.append(to_string(nodeID));
+		g_info_String.append(": ");
+		g_info_String.append(to_string(intersection_Total_Delay));
+		MainModual.WriteLog(1, g_info_String, 3);
+
+
+
+		g_info_String = "Average Delay of Intersection_NodeID_";
+		g_info_String.append(to_string(nodeID));
+		g_info_String.append(": ");
+		g_info_String.append(to_string(intersection_Average_Delay));
+		MainModual.WriteLog(1, g_info_String, 3);
+	}
+
+	void Judge_Signal_LOS(int nodeID)
+	{
+		if (intersection_Total_Delay <= 10)
+		{
+			LOS = "A";
+		}
+		else if (intersection_Total_Delay <= 20)
+		{
+			LOS = "B";
+		}
+		else if (intersection_Total_Delay <= 35)
+		{
+			LOS = "C";
+		}
+		else if (intersection_Total_Delay <= 55)
+		{
+			LOS = "D";
+		}
+		else if (intersection_Total_Delay <= 80)
+		{
+			LOS = "E";
+		}
+		else
+		{
+			LOS = "F";
+		}
+		g_info_String = "LOS of Intersection_NodeID_";
+		g_info_String.append(to_string(nodeID));
+		g_info_String.append(": ");
+		g_info_String.append(LOS);
+		MainModual.WriteLog(1, g_info_String, 3);
+	}
 
 	int signal_node_seq_no;  // sequence number 
 	int main_node_id;      //external node number 
 
 	std::vector<int> m_movement_link_seq_no_vector;
+
+	//void Set_Movement_Array()
+//{
+//	//movement_Array 
+//	movement_Array[1].Enable = true;
+//	movement_Array[1].Volume = 300;
+//	movement_Array[1].StageNo = stage(movement_to_Stage_Array[1]);
+//	movement_Array[1].GroupNo = group(1);
+//	movement_Array[1].DirectionNo = E;
+
+//	movement_Array[2].Enable = true;
+//	movement_Array[2].Volume = 900;
+//	movement_Array[2].StageNo = stage(movement_to_Stage_Array[2]);
+//	movement_Array[2].GroupNo = group(2);
+//	movement_Array[2].DirectionNo = E;
+
+//	movement_Array[3].Enable = true;
+//	movement_Array[3].Volume = 200;
+//	movement_Array[3].StageNo = stage(movement_to_Stage_Array[3]);
+//	movement_Array[3].GroupNo = group(2);
+//	movement_Array[3].DirectionNo = E;
+
+//	movement_Array[4].Enable = true;
+//	movement_Array[4].Volume = 250;
+//	movement_Array[4].StageNo = stage(movement_to_Stage_Array[4]);
+//	movement_Array[4].GroupNo = group(1);
+//	movement_Array[4].DirectionNo = W;
+
+//	movement_Array[5].Enable = true;
+//	movement_Array[5].Volume = 1000;
+//	movement_Array[5].StageNo = stage(movement_to_Stage_Array[5]);
+//	movement_Array[5].GroupNo = group(2);
+//	movement_Array[5].DirectionNo = W;
+
+//	movement_Array[6].Enable = true;
+//	movement_Array[6].Volume = 150;
+//	movement_Array[6].StageNo = stage(movement_to_Stage_Array[6]);
+//	movement_Array[6].GroupNo = group(2);
+//	movement_Array[6].DirectionNo = W;
+
+//	movement_Array[7].Enable = true;
+//	movement_Array[7].Volume = 70;
+//	movement_Array[7].StageNo = stage(movement_to_Stage_Array[7]);
+//	movement_Array[7].GroupNo = group(1);
+//	movement_Array[7].DirectionNo = N;
+
+//	movement_Array[8].Enable = true;
+//	movement_Array[8].Volume = 310;
+//	movement_Array[8].StageNo = stage(movement_to_Stage_Array[8]);
+//	movement_Array[8].GroupNo = group(2);
+//	movement_Array[8].DirectionNo = N;
+
+//	movement_Array[9].Enable = true;
+//	movement_Array[9].Volume = 60;
+//	movement_Array[9].StageNo = stage(movement_to_Stage_Array[9]);
+//	movement_Array[9].GroupNo = group(2);
+//	movement_Array[9].DirectionNo = N;
+
+//	movement_Array[10].Enable = true;
+//	movement_Array[10].Volume = 90;
+//	movement_Array[10].StageNo = stage(movement_to_Stage_Array[10]);
+//	movement_Array[10].GroupNo = group(1);
+//	movement_Array[10].DirectionNo = S;
+
+//	movement_Array[11].Enable = true;
+//	movement_Array[11].Volume = 340;
+//	movement_Array[11].StageNo = stage(movement_to_Stage_Array[11]);
+//	movement_Array[11].GroupNo = group(2);
+//	movement_Array[11].DirectionNo = S;
+
+//	movement_Array[12].Enable = true;
+//	movement_Array[12].Volume = 50;
+//	movement_Array[12].StageNo = stage(movement_to_Stage_Array[12]);
+//	movement_Array[12].GroupNo = group(2);
+//	movement_Array[12].DirectionNo = S;
+
+//}
 
 };
 
@@ -1250,7 +1560,7 @@ inline string g_time_coding(float time_stamp)
 void g_ProgramStop()
 {
 
-	cout << "STALite Program stops. Press any key to terminate. Thanks!" << endl;
+	MainModual.WriteLog(2, "Program stops. Press any key to terminate. Thanks!", 1);
 	getchar();
 	exit(0);
 };
@@ -1265,11 +1575,12 @@ void g_ReadInputData(CMainModual& MainModual)
 
 	//step 0:read demand period file
 	CCSVParser parser_demand_period;
-	cout << "Step 1: Reading file demand_period.csv..." << endl;
+	MainModual.WriteLog(0, "Step 1: Reading file demand_period.csv...", 1);
 	//g_LogFile << "Step 7.1: Reading file input_agent_type.csv..." << g_GetUsedMemoryDataInMB() << endl;
 	if (!parser_demand_period.OpenCSVFile("demand_period.csv", true))
 	{
-		cout << "demand_period.csv cannot be opened. " << endl;
+		MainModual.WriteLog(2, "demand_period.csv cannot be opened.", 1);
+
 		g_ProgramStop();
 
 	}
@@ -1283,7 +1594,7 @@ void g_ReadInputData(CMainModual& MainModual)
 
 			if (parser_demand_period.GetValueByFieldName("demand_period_id", demand_period_id) == false)
 			{
-				cout << "Error: Field demand_period_id in file demand_period cannot be read." << endl;
+				MainModual.WriteLog(2, "Error: Field demand_period_id in file demand_period cannot be read.", 1);
 				g_ProgramStop();
 				break;
 			}
@@ -1293,7 +1604,8 @@ void g_ReadInputData(CMainModual& MainModual)
 			string time_period;
 			if (parser_demand_period.GetValueByFieldName("time_period", time_period) == false)
 			{
-				cout << "Error: Field time_period in file demand_period cannot be read." << endl;
+				MainModual.WriteLog(2, "Error: Field time_period in file demand_period cannot be read.", 1);
+
 				g_ProgramStop();
 				break;
 			}
@@ -1332,8 +1644,6 @@ void g_ReadInputData(CMainModual& MainModual)
 	CCSVParser parser;
 	if (parser.OpenCSVFile("node.csv", true))
 	{
-
-
 		while (parser.ReadRecord())  // if this line contains [] mark, then we will also read field headers.
 		{
 
@@ -1361,10 +1671,13 @@ void g_ReadInputData(CMainModual& MainModual)
 
 			MainModual.g_number_of_nodes++;
 			if (MainModual.g_number_of_nodes % 5000 == 0)
+			{
 				cout << "reading " << MainModual.g_number_of_nodes << " nodes.. " << endl;
+			}
 		}
-
-		cout << "number of nodes = " << MainModual.g_number_of_nodes << endl;
+		g_info_String = "Number of Nodes = ";
+		g_info_String.append(to_string(MainModual.g_number_of_nodes));
+		MainModual.WriteLog(0, g_info_String, 2);
 
 	//	fprintf(g_pFileOutputLog, "number of nodes =,%d\n", MainModual.g_number_of_nodes);
 
@@ -1471,8 +1784,7 @@ void g_ReadInputData(CMainModual& MainModual)
 			string movement_str;
 			parser_link.GetValueByFieldName("movement_str", movement_str);
 
-			int lanes;
-			parser_link.GetValueByFieldName("lanes", lanes);
+
 
 			if (movement_str.size() > 0)  // and valid
 			{
@@ -1487,6 +1799,9 @@ void g_ReadInputData(CMainModual& MainModual)
 				int initial_volume = 200;
 				parser_link.GetValueByFieldName("volume", initial_volume, true, false);
 
+				int lanes;
+				parser_link.GetValueByFieldName("lanes", lanes);
+
 				if(main_node_id>=1)
 				{
 					g_signal_node_map[main_node_id].AddMovementVolume(link.link_seq_no, movement_str, initial_volume,lanes);
@@ -1498,7 +1813,9 @@ void g_ReadInputData(CMainModual& MainModual)
 		}
 		parser_link.CloseCSVFile();
 	// we now know the number of links
-	cout << "number of links = " << MainModual.g_number_of_links << endl;
+		g_info_String = "Number of Links = ";
+		g_info_String.append(to_string(MainModual.g_number_of_links));
+		MainModual.WriteLog(0, g_info_String, 2);
 
 //	fprintf(g_pFileOutputLog, "number of links =,%d\n", MainModual.g_number_of_links);
 
@@ -1514,7 +1831,23 @@ double SignalAPI(int iteration_number, int MainModual_mode, int column_updating_
 
 	for (std::map<int, CSignalNode>::iterator it = g_signal_node_map.begin(); it != g_signal_node_map.end(); ++it)
 	{
-		it->second.PerformQEM();
+		//cout << "Signal Node ID " << it->first << ":" << endl;
+		g_info_String = "Start Signal Node ID ";
+		g_info_String.append(to_string(it->first));
+		g_info_String.append(":");
+		MainModual.WriteLog(0, g_info_String, -1);
+
+
+
+		it->second.PerformQEM(it->first);
+
+
+
+		g_info_String = "End Signal Node ID ";
+		g_info_String.append(to_string(it->first));
+		g_info_String.append(":");
+		MainModual.WriteLog(0, g_info_String, -2);
+
 	}
 
 	//output service_arc.csv
@@ -1530,7 +1863,7 @@ double SignalAPI(int iteration_number, int MainModual_mode, int column_updating_
 	}
 	else
 	{
-
+		//TODO: finish the output of service arcs
 
 		fprintf(g_pFileServiceArc, "road_link_id,from_node_id,to_node_id,time_window,time_interval,travel_time_delta,capacity,cycle_no,cycle_length,main_node_id,stage,movement_str,\n");
 
@@ -1545,50 +1878,50 @@ double SignalAPI(int iteration_number, int MainModual_mode, int column_updating_
 			int ci = 0;
 
 			for (int m = 1; m < movementSize; m++)
+			{
+				if (sn.movement_Array[m].Enable)
 				{
-					if (sn.movement_Array[m].Enable)
-					{
 
-						int StageNo = sn.movement_Array[m].StageNo;
-						// we should also consider offset.
-						int global_start_time_in_sec = sn.cumulative_green_start_time_Stage_Array[StageNo] + cycle_time_in_sec * ci + g_loading_start_time_in_sec;
-						int global_end_time_in_sec = sn.cumulative_green_end_time_Stage_Array[StageNo] + cycle_time_in_sec * ci + g_loading_start_time_in_sec;
+					int StageNo = sn.movement_Array[m].StageNo;
+					// we should also consider offset.
+					int global_start_time_in_sec = sn.cumulative_Green_Start_Time_Stage_Array[StageNo] + cycle_time_in_sec * ci + g_loading_start_time_in_sec;
+					int global_end_time_in_sec = sn.cumulative_Green_Start_Time_Stage_Array[StageNo] + cycle_time_in_sec * ci + g_loading_start_time_in_sec;
 
-						//0300:30
-						int start_hour = global_start_time_in_sec / 3600;
-						int start_min = global_start_time_in_sec / 60 - start_hour * 60;
-						int start_sec = global_start_time_in_sec % 60;
+					//0300:30
+					int start_hour = global_start_time_in_sec / 3600;
+					int start_min = global_start_time_in_sec / 60 - start_hour * 60;
+					int start_sec = global_start_time_in_sec % 60;
 
-						int end_hour = global_end_time_in_sec / 3600;
-						int end_min = global_end_time_in_sec / 60 - end_hour * 60;
-						int end_sec = global_end_time_in_sec % 60;
+					int end_hour = global_end_time_in_sec / 3600;
+					int end_min = global_end_time_in_sec / 60 - end_hour * 60;
+					int end_sec = global_end_time_in_sec % 60;
 
-						int from_node_id = g_node_vector[g_link_vector[sn.movement_Array[m].LinkSeqNo].from_node_seq_no].node_id;
-						int to_node_id = g_node_vector[g_link_vector[sn.movement_Array[m].LinkSeqNo].to_node_seq_no].node_id;
-						//						float capacity = sn.green_Time_Stage_Array[StageNo] * sn.saturation_Flow_Rate_Matrix[StageNo][m] / 3600.0;
-						float capacity = sn.green_Time_Stage_Array[StageNo] * 1800.0 / 3600.0;
-						fprintf(g_pFileServiceArc, "%s,%d,%d,%02d%02d:%02d_%02d%02d:%02d,-1,-1,%f,%d,%d,%d,%d,%s\n",
-							g_link_vector[sn.movement_Array[m].LinkSeqNo].link_id.c_str(),
-							from_node_id,
-							to_node_id,
-							start_hour,
-							start_min,
-							start_sec,
-							end_hour,
-							end_min,
-							end_sec,
-							capacity,
-							ci,
-							cycle_time_in_sec,
-							it->first,
-							StageNo,
-							sn.movement_str_array[m].c_str()
-						);
+					int from_node_id = g_node_vector[g_link_vector[sn.movement_Array[m].LinkSeqNo].from_node_seq_no].node_id;
+					int to_node_id = g_node_vector[g_link_vector[sn.movement_Array[m].LinkSeqNo].to_node_seq_no].node_id;
+					//						float capacity = sn.green_Time_Stage_Array[StageNo] * sn.saturation_Flow_Rate_Matrix[StageNo][m] / 3600.0;
+					float capacity = sn.green_Time_Stage_Array[StageNo] * 1800.0 / 3600.0;
+					fprintf(g_pFileServiceArc, "%s,%d,%d,%02d%02d:%02d_%02d%02d:%02d,-1,-1,%f,%d,%d,%d,%d,%s\n",
+						g_link_vector[sn.movement_Array[m].LinkSeqNo].link_id.c_str(),
+						from_node_id,
+						to_node_id,
+						start_hour,
+						start_min,
+						start_sec,
+						end_hour,
+						end_min,
+						end_sec,
+						capacity,
+						ci,
+						cycle_time_in_sec,
+						it->first,
+						StageNo,
+						sn.movement_str_array[m].c_str()
+					);
 
-					}  // per movement
+				}  // per movement
 
-			}
-			
+
+			}  // per cycle
 		}  // per signal node
 
 		fclose(g_pFileServiceArc);
@@ -1599,6 +1932,3 @@ double SignalAPI(int iteration_number, int MainModual_mode, int column_updating_
 	return 1;
 
 }
-
-
-
