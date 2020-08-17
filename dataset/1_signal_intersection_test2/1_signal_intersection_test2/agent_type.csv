@@ -1,0 +1,2 @@
+agent_type,name,VOT,flow_type,PCE_link_type1,PCE_link_type2,CRU_link_type1,CRU_link_type2
+p,passenger,10,0,1,1,1,1
