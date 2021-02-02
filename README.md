@@ -1,4 +1,4 @@
-# SignalAPI
+# Data2SignalTiming
 Quick Estimation Method based implementation, GMNS based traffic signal API for multi-resolution modeling
 
 This tool aims to automate the process of optimizing movement-based, phase-based signal control strategy and provide the interfaces for AMS modeling 
@@ -20,8 +20,8 @@ Critical intersection volume-to-capacity ratio
 Control delay & LOS
 ![QEM](doc/img/qem.png)
 
-Step 2: C++ based, GMNS based version for movement-based, phase-based signal control strategy optimization
-Developed by the research team led by Dr. Xuesong (Simon) Zhou at Arizona State University (xzhou74@asu.edu)
+Step 2:Pathon based, GMNS based version for movement-based, phase-based signal control strategy optimization
+Developed by the research team led by Dr. Xuesong (Simon) Zhou at Arizona State University (xzhou74@asu.edu) and Dr. Milan Zlatkovic at  University of Wyoming
 https://github.com/xzhou99/SignalAPI/blob/master/src/Exe_src/AgentLite/main_api.cpp
 ![NeXTA](doc/img/nexta.png)
 
