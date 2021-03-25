@@ -30,6 +30,10 @@ design and case study." *Journal of Advanced Transportation* 49, no. 6 (2015):
 683-699. ([Open
 Access](https://onlinelibrary.wiley.com/doi/full/10.1002/atr.1295))
 
+1.4. Try to test different results from different movement configurations at
+https://github.com/asu-trans-ai-lab/vol2timing/tree/master/examples/
+3_simple_cases
+
 **\#Highlights:**
 
 Planning-level analysis of existing intersections
@@ -55,9 +59,9 @@ University of Wyoming
 | src                    | source code of Vol2Timing                            |
 | Release                | Python test code and data set                        |
 | Doc                    | User’s guide and other documentations for Vol2Timing |
-| Dataset                | Case studies                                         |
+| Examples               | Simple test cases and real world examples            |
 
-2.1. Test data set at
+2.1. Test data set at for ASU network
 
 <https://github.com/asu-trans-ai-lab/vol2timing/tree/master/release>
 
@@ -82,6 +86,8 @@ https://github.com/asu-trans-ai-lab/vol2timing/blob/master/release/test.py
 <https://github.com/asu-trans-ai-lab/vol2timing/blob/master/vol2timing.ipynb>
 
 (3) Utah State Street example from the original osm file at
+
+<https://github.com/asu-trans-ai-lab/vol2timing/tree/master/examples/Utah_state_street>
 
 2.3. For advanced users, you can check out our source code at
 <https://github.com/asu-trans-ai-lab/vol2timing/tree/master/src>, and learn the
