@@ -12,14 +12,15 @@ files.
 The users and students can follow the steps below to learn and use this set of
 tools.
 
-**Step 1: Excel based Tool**
+**Step 1: Familiar with Excel based Tool**
 
 Please check out the tool developed by Dr. Milan Zlatkovic at University of
 Wyoming
 (http://www.uwyo.edu/civil/faculty_staff/faculty/milan-zlatkovic/index.html,
 mzlatkov\@uwyo.edu) for his Excel based Quick Estimation Method
 
-1.  Excel files: <https://github.com/milan1981/Sigma-X>
+1.1. Excel files:
+https://github.com/milan1981/Sigma-X/blob/master/Sigma-X_v2_GMNS.xlsm
 
 1.2: Youtube teaching video: <https://www.youtube.com/watch?v=Q1CxQFM9D5U>
 
@@ -29,7 +30,7 @@ design and case study." *Journal of Advanced Transportation* 49, no. 6 (2015):
 683-699. ([Open
 Access](https://onlinelibrary.wiley.com/doi/full/10.1002/atr.1295))
 
-\#Highlights:
+**\#Highlights:**
 
 Planning-level analysis of existing intersections
 
@@ -38,27 +39,25 @@ Estimation of signal timing parameters for known inputs
 Major elements: Left-turn treatment; Lane volume; Signal timing; Critical
 intersection volume-to-capacity ratio; Control delay & LOS
 
-![QEM](doc/img/qem.png)
+![](media/dca19eb11df2e8bbbbff879926a11e77.png)
 
-**Step 2:Pathon based, GMNS based Tool**
+**Step 2: Python package-based tool**
 
-version for movement-based, phase-based signal control strategy optimization
-Developed by the research team led by Dr. Xuesong (Simon) Zhou at Arizona State
-University (xzhou74\@asu.edu) and Dr. Milan Zlatkovic at University of Wyoming
+This python version aims to generate movement-based, phase-based signal control
+strategy, developed by the research teams led by Dr. Xuesong (Simon) Zhou at
+Arizona State University (xzhou74\@asu.edu) and Dr. Milan Zlatkovic at
+University of Wyoming
 
 >   Table 1. Folders of Vol2Timing package
 
-| **Github Folder Name** | **Contents**                                                                                                                                                                                                            |
-|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Src                    | source code of Vol2Timing                                                                                                                                                                                               |
-| Release                | Executable of Vol2Timing.exe in Windows                                                                                                                                                                                 |
-| Doc                    | User’s guide and other documentations for Vol2Timing                                                                                                                                                                    |
-| Dataset                | 1. Steps for Signal Control.docx 2. GMNS based network csv files, and additional extension in the **road_link.csv** for additional movement related attributes) 3. Case studies (including 3 cases with QEM Excel file) |
+| **Github Folder Name** | **Contents**                                         |
+|------------------------|------------------------------------------------------|
+| src                    | source code of Vol2Timing                            |
+| Release                | Python test code and data set                        |
+| Doc                    | User’s guide and other documentations for Vol2Timing |
+| Dataset                | Case studies                                         |
 
-2.1. Check source code at
-<https://github.com/asu-trans-ai-lab/vol2timing/tree/master/src>
-
-2.2. Data set at
+2.1. Test data set at
 
 <https://github.com/asu-trans-ai-lab/vol2timing/tree/master/release>
 
@@ -67,27 +66,26 @@ movement.csv, and output files of (1) signal_timing_phase.csv, (2)
 signal_phase_mvmt.csv in GMNS format, as well as (3) timing.csv for quick
 mesoscopic and microscopic simulation.
 
-To check out the location of signal intersections, please create a node.csv
+To visualize the location of signal intersections, please create a node.csv
 contains only nodes with field osm_highway== “traffic_signals”, and use
 <https://asu-trans-ai-lab.github.io/index.html#/> to visualize the locations of
 signalized intersections.
 
 ![](media/9dfce61b30e45b0baa5aed3bb1758833.png)
 
-2.3. Try test script at
+2.2. Try test script at
 
 (1) Python code at
 https://github.com/asu-trans-ai-lab/vol2timing/blob/master/release/test.py
 
 (2) Jupyter Notebook at
-https://github.com/asu-trans-ai-lab/vol2timing/blob/master/vol2timing.ipynb
+<https://github.com/asu-trans-ai-lab/vol2timing/blob/master/vol2timing.ipynb>
 
-2.4. Learn the steps from the log file (\*.log) at
-https://github.com/asu-trans-ai-lab/vol2timing/tree/master/release
+(3) Utah State Street example from the original osm file at
 
-The first field in each table represents the primary reference.
-
-![NeXTA](doc/img/nexta.png)
+2.3. For advanced users, you can check out our source code at
+<https://github.com/asu-trans-ai-lab/vol2timing/tree/master/src>, and learn the
+steps from the log file (\*.log)
 
 Other useful references:
 

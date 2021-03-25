@@ -26,4 +26,5 @@ og.outputNetToCSV(net)
 
 net = og.getNetFromCSV()
 og.consolidateComplexIntersections(net)
-og.outputNetToCSV(net, output_folder='consolidated')
+og.generateMovements(net)
+og.outputNetToCSV(net)
