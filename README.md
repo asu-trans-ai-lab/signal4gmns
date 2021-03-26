@@ -32,13 +32,37 @@ Access](https://onlinelibrary.wiley.com/doi/full/10.1002/atr.1295))
 
 1.4. Try to test different results from different movement configurations at
 https://github.com/asu-trans-ai-lab/vol2timing/tree/master/examples/
-3_simple_cases
+**3_simple_cases**
 
-|                                     |                                                                                          |                                                                                                                                                                                                                                                                                |
-|-------------------------------------|------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Case 1: 3 lanes EW                  | [media/d6fc220943245a2e6165e130cc68ec13.png](media/d6fc220943245a2e6165e130cc68ec13.png) | CL=50 s [media/d8ce5f326dd28ffa02db2140bdae72e0.png media/0085320a445815036aa59c86d26c0c56.png media/2c974551e67cd44ee4635125da9a7193.png](media/d8ce5f326dd28ffa02db2140bdae72e0.png media/0085320a445815036aa59c86d26c0c56.png media/2c974551e67cd44ee4635125da9a7193.png)   |
-| 4 lanes EW with left turn volume    | [media/2fda34a037204763b42bdf2f714c5789.png](media/2fda34a037204763b42bdf2f714c5789.png) | CL =150 s [media/f09ee76a4115abd17f80df38349509d7.png media/7455294d81f8a8da6a3951b3832a5e58.png media/12c12afd0aad2764b6ca0ad2253bdac9.png](media/f09ee76a4115abd17f80df38349509d7.png media/7455294d81f8a8da6a3951b3832a5e58.png media/12c12afd0aad2764b6ca0ad2253bdac9.png) |
-| 4 lanes EW without left turn volume | [media/29da9800250df786f860c1f13f674eaf.png](media/29da9800250df786f860c1f13f674eaf.png) | CL =80 s [media/f2ac8d7b8a82c3aa6166aa38f62c7145.png media/6bcb91bf61305e1f69ddbdfb1c22cdbd.png media/df605e6ee51382482e8144262fdc9465.png](media/f2ac8d7b8a82c3aa6166aa38f62c7145.png media/6bcb91bf61305e1f69ddbdfb1c22cdbd.png media/df605e6ee51382482e8144262fdc9465.png)  |
+**Case 3: Major EW 3 lanes**
+
+![](media/829c82631b6808e8b7322c86d68066d6.png)
+
+CL=50 s
+
+![](media/d8ce5f326dd28ffa02db2140bdae72e0.png)
+
+![](media/0085320a445815036aa59c86d26c0c56.png)
+
+**Case 4L: Major EW 4 lanes with left turn volume**
+
+![](media/3c5e059d6cb31d36073ae8263e7d291f.png)
+
+![](media/f09ee76a4115abd17f80df38349509d7.png)
+
+![](media/7455294d81f8a8da6a3951b3832a5e58.png)
+
+CL =150 s
+
+**Case 4: Major EW 4 lanes without left turn volume**
+
+![](media/29da9800250df786f860c1f13f674eaf.png)
+
+CL =80 s
+
+![](media/d8ce5f326dd28ffa02db2140bdae72e0.png)
+
+![](media/6bcb91bf61305e1f69ddbdfb1c22cdbd.png)
 
 **\#Highlights:**
 
@@ -131,7 +155,7 @@ First, we should extract movement, volume, and lane information from Fig.1.
 
 Step 2. Select signal phasing
 
-1.  **Determine left-turn treatment**
+**2.1 Determine left-turn treatment**
 
 There are several principles for determining left-turn treatment.
 
