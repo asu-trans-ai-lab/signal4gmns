@@ -5,6 +5,6 @@ from.signal4gmns import *
 # import os
 
 
-# https://blog.csdn.net/guiyin1150/article/details/109341626
+
 
 name="signal4gmns"

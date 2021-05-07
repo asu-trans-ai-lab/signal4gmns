@@ -4,15 +4,14 @@ class CSignal_Link_Inter():
         pass
 
 class CSignal_Node_Inter():
-    def __init__(self, signalCode:str, x_coord, y_coord, init_parameters):
+    def __init__(self, signalCode:str, x_coord, y_coord):
         self.signalCode=signalCode
         self.osm_Node_ID=self.signalCode.split('|')[-1].split('_')[-1]
         self.x_coord=x_coord
         self.y_coord=y_coord
-        self.init_parameters=init_parameters
 
 class CSignal_Movement_Inter():
-    def __init__(self, movementCode:str, signal_Node:CSignal_Node_Inter, stageNo_in_Order:list, groupNo:EGroup, directionNo:EDirection, ib_Link_id, ob_Link_id, ib_osm_node_id, ob_osm_node_id, lanes:int, movement_str:str, osm_node_id, node_id, volume, geometry, init_parameters):
+    def __init__(self, movementCode:str, signal_Node:CSignal_Node_Inter, stageNo_in_Order:list, groupNo:EGroup, directionNo:EDirection, ib_Link_id, ob_Link_id, ib_osm_node_id, ob_osm_node_id, lanes:int, movement_str:str, osm_node_id, node_id, volume, geometry):
         self.movementCode= movementCode
         self.osm_node_id=osm_node_id
         self.node_id=node_id
@@ -30,9 +29,8 @@ class CSignal_Movement_Inter():
         self.movement_str=movement_str
         self.volume=volume
         self.geometry=geometry
-        self.initialized_parameters=init_parameters
 
-class CSignal_Node_Inter_List():
+class CSignal_Node_Interm_List():
     def __init__(self):
         self.signal_Node_List = []
 
@@ -46,12 +44,11 @@ class CSignal_Node_Inter_List():
                 node.signalCode,
                 node.osm_Node_ID,
                 node.x_coord,
-                node.y_coord,
-                str(node.init_parameters)
+                node.y_coord
             ])
         return sequence
 
-class CSignal_Movement_Inter_List():
+class CSignal_Movement_Interm_List():
     def __init__(self):
         self.signal_Movement_List=[]
 
@@ -78,8 +75,5 @@ class CSignal_Movement_Inter_List():
                 movement.movement_str,
                 movement.volume,
                 movement.geometry,
-                str(movement.initialized_parameters)
             ])
         return sequence
-
-# change output to intermediate

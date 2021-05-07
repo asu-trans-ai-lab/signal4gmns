@@ -1,5 +1,3 @@
-# one signal node, one nema_phase table
-from enum import Enum
 from .signal4gmns import CSignalNode
 from .Enums import *
 

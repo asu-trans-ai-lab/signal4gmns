@@ -12,13 +12,6 @@ class YamlHandler:
         return data
 
     def write_yaml(self,data):
-        """
-        Chinese needs add allow_unicode=True
-        :param yaml_path:
-        :param data:
-        :param encoding:
-        :return:
-        """
         with open(self.file,'w',encoding=self.encoding) as f:
             yaml.dump(data,stream=f,allow_unicode = True)
 
