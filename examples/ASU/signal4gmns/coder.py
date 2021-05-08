@@ -25,7 +25,7 @@ def GetSignalCode(majorApproach:E_Major_Approach, approach_Existed_Movement_Matr
             pass
         existed_Code+=f"{approach}_{approach_existed}|"
     signal_Code=f"{'T' if type==E_Signal_Type.T_junction else '#'}|Ma_{'EW' if majorApproach==E_Major_Approach.EW else 'NS'}|" \
-                  f"{existed_Code}OSMID_{OSM_ID}"
+                  f"{existed_Code}"#OSMID_{OSM_ID}
     return signal_Code
 
 def GetMovementCode(movement_Index:EMovement_Index,left_Turn_Treatment:ELeft_Turn_Treatment,NEMA_Phase:E_NEMA_Phase,ring:E_NEMA_Ring,barrier:E_NEMA_Barrier):

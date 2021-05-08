@@ -4,9 +4,9 @@ class CSignal_Link_Inter():
         pass
 
 class CSignal_Node_Inter():
-    def __init__(self, signalCode:str, x_coord, y_coord):
+    def __init__(self, signalCode:str,osmID, x_coord, y_coord):
         self.signalCode=signalCode
-        self.osm_Node_ID=self.signalCode.split('|')[-1].split('_')[-1]
+        self.osm_Node_ID=osmID
         self.x_coord=x_coord
         self.y_coord=y_coord
 

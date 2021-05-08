@@ -5,14 +5,18 @@ from pathlib import Path
 #project_path = Path.cwd().parent
 project_path = Path.cwd()
 log_path = Path(project_path)
-t = time.strftime("%Y_%m_%d_%H_%M_%S")
+# t = time.strftime("%Y_%m_%d_%H_%M_%S")
+t = time.strftime("%m_%d_%Y")
 
 
-# https://www.jianshu.com/p/b6bc25d9c068  Singleton mode
+
 class Loggings:
     __instance = None
-    loggingFullPath = f"{log_path}\\vol2timing_log_{t}.log"
-    logger.add(sink=loggingFullPath, format="{time} |{level}|{message}", rotation="500MB", encoding="utf-8", enqueue=True)
+    loggingFullPath = f"{log_path}\\signal4gmns_log_{t}.log"
+    logger.remove(handler_id=None)# console off
+    # format_output="{time} |{level}|{message}"
+    format_output = "{message}"
+    logger.add(sink=loggingFullPath, format=format_output, rotation="500MB", encoding="utf-8", enqueue=True)
     def __new__(cls, *args, **kwargs):
         if not cls.__instance:
             cls.__instance = super(Loggings, cls).__new__(cls, *args, **kwargs)
@@ -20,6 +24,7 @@ class Loggings:
         return cls.__instance
 
     def info(self, msg, level=1):
+        print("--" * level + msg)
         return logger.info("--" * level + msg)
 
     def debug(self, msg):

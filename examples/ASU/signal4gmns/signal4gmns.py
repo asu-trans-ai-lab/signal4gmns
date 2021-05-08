@@ -135,7 +135,7 @@ class CSignalNode:
         self.t_Yellow = _config_Parameters['t_Yellow']
         self.t_AR = _config_Parameters['t_AR']
         self.minGreenTime = _config_Parameters['minGreenTime']
-        self.OMS_Node_ID=None
+        self.OSM_Node_ID=None
         self.start_time_in_min=_config_Parameters['start_time_in_min']
         self.end_time_in_min=_config_Parameters['end_time_in_min']
 
@@ -648,28 +648,28 @@ class CSignalNode:
         loggings.info('Step 2.9: Print Green Time for Stages', 3)
         self.cumulative_Green_Start_Time_Stage_Array[1] = 0
         self.cumulative_Green_End_Time_Stage_Array[1] = self.green_Time_Stage_Array[1]
-        loggings.info(f"Green Time of Stage1: {self.green_Time_Stage_Array[1]}s",4)
-        loggings.info(f"Start Green Time of Stage 1: {self.cumulative_Green_Start_Time_Stage_Array[1]}s",4)
-        loggings.info(f"End Green Time of Stage 1: {self.cumulative_Green_End_Time_Stage_Array[1]}s",4)
+        loggings.info(f"Green Time of Stage1: {round(self.green_Time_Stage_Array[1],1)}s",4)
+        loggings.info(f"Start Green Time of Stage 1: {round(self.cumulative_Green_Start_Time_Stage_Array[1],1)}s",4)
+        loggings.info(f"End Green Time of Stage 1: {round(self.cumulative_Green_End_Time_Stage_Array[1],1)}s",4)
 
         for i in range(2, self.stage_Actual_Size + 1):
             self.cumulative_Green_Start_Time_Stage_Array[i] = self.cumulative_Green_End_Time_Stage_Array[i - 1]
             self.cumulative_Green_End_Time_Stage_Array[i] = self.cumulative_Green_Start_Time_Stage_Array[i] + self.green_Time_Stage_Array[i]
-            loggings.info(f"Green Time of Stage1: {self.green_Time_Stage_Array[i]}s", 4)
-            loggings.info(f"Start Green Time of Stage 1: {self.cumulative_Green_Start_Time_Stage_Array[i]}s", 4)
-            loggings.info(f"End Green Time of Stage 1: {self.cumulative_Green_End_Time_Stage_Array[i]}s", 4)
+            loggings.info(f"Green Time of Stage1: {round(self.green_Time_Stage_Array[i],1)}s", 4)
+            loggings.info(f"Start Green Time of Stage 1: {round(self.cumulative_Green_Start_Time_Stage_Array[i],1)}s", 4)
+            loggings.info(f"End Green Time of Stage 1: {round(self.cumulative_Green_End_Time_Stage_Array[i],1)}s", 4)
 
         self.cumulative_Effective_Green_Start_Time_Stage_Array[1] = 0
         self.cumulative_Effective_Green_End_Time_Stage_Array[1] = self.effective_Green_Time_Stage_Array[1]
-        loggings.info(f"Effective Green Time of Stage1: {self.effective_Green_Time_Stage_Array[1]}s",4)
-        loggings.info(f"Start Effective Green Time of Stage 1: {self.cumulative_Effective_Green_Start_Time_Stage_Array[1]}s",4)
-        loggings.info(f"End Effective Green Time of Stage 1: {self.cumulative_Effective_Green_Start_Time_Stage_Array[1]}s",4)
+        loggings.info(f"Effective Green Time of Stage1: {round(self.effective_Green_Time_Stage_Array[1],1)}s",4)
+        loggings.info(f"Start Effective Green Time of Stage 1: {round(self.cumulative_Effective_Green_Start_Time_Stage_Array[1],1)}s",4)
+        loggings.info(f"End Effective Green Time of Stage 1: {round(self.cumulative_Effective_Green_Start_Time_Stage_Array[1],1)}s",4)
         for i in range(2, self.stage_Actual_Size + 1):
             self.cumulative_Effective_Green_Start_Time_Stage_Array[i] = self.cumulative_Effective_Green_End_Time_Stage_Array[i - 1]
             self.cumulative_Effective_Green_End_Time_Stage_Array[i] = self.cumulative_Effective_Green_Start_Time_Stage_Array[i] + self.effective_Green_Time_Stage_Array[i]
-            loggings.info(f"Effective Green Time of Stage1: {self.effective_Green_Time_Stage_Array[i]}s", 4)
-            loggings.info(f"Start Effective Green Time of Stage 1: {self.cumulative_Effective_Green_Start_Time_Stage_Array[i]}s", 4)
-            loggings.info(f"End Effective Green Time of Stage 1: {self.cumulative_Effective_Green_Start_Time_Stage_Array[i]}s", 4)
+            loggings.info(f"Effective Green Time of Stage1: {round(self.effective_Green_Time_Stage_Array[i],1)}s", 4)
+            loggings.info(f"Start Effective Green Time of Stage 1: {round(self.cumulative_Effective_Green_Start_Time_Stage_Array[i],1)}s", 4)
+            loggings.info(f"End Effective Green Time of Stage 1: {round(self.cumulative_Effective_Green_Start_Time_Stage_Array[i],1)}s", 4)
 
     def Calculate_Capacity_And_Ratio_V_over_C(self):
         loggings.info('Step 2.10: Calculate Capacity and V over C Ratio', 3)
@@ -678,10 +678,10 @@ class CSignalNode:
                 for so in range(len(self.movement_Array[m].StageNo_in_Order)):
                     if self.saturation_Flow_Rate_Matrix[s][m] != 0 and self.movement_Array[m].Enable and self.movement_Array[m].StageNo_in_Order[so].value == s:
                         self.capacity_by_Stage_and_Movement_Matrix[s][m] = self.saturation_Flow_Rate_Matrix[s][m] * self.ratio_of_Effective_Green_Time_to_Cycle_Length_Array[s]
-                        self.Info=f"a. Capacity of Stage({s}) and Movement({EMovement_Index(m).name}): {self.capacity_by_Stage_and_Movement_Matrix[s][m]}"
+                        self.Info=f"a. Capacity of Stage({s}) and Movement({EMovement_Index(m).name}): {round(self.capacity_by_Stage_and_Movement_Matrix[s][m],1)}"
                         loggings.info(self.Info,4)
                         self.v_over_C_by_Stage_and_Movement_Matrix[s][m] = self.movement_Array[m].Volume / self.capacity_by_Stage_and_Movement_Matrix[s][m]
-                        self.Info=f"b. V/C of Stage({s}) and Movement({EMovement_Index(m).name}): {self.v_over_C_by_Stage_and_Movement_Matrix[s][m]}"
+                        self.Info=f"b. V/C of Stage({s}) and Movement({EMovement_Index(m).name}): {round(self.v_over_C_by_Stage_and_Movement_Matrix[s][m],1)}"
                         loggings.info(self.Info,4)
 
     def Calculate_Signal_Delay(self, nodeID):
@@ -701,8 +701,8 @@ class CSignalNode:
             self.intersection_Total_Delay += self.approach_Average_Delay_Array[d] * self.approach_Total_Volume_Array[d]
             self.intersection_Total_Volume += self.approach_Total_Volume_Array[d]
         self.intersection_Average_Delay = self.intersection_Total_Delay / self.intersection_Total_Volume
-        loggings.info(f"Total Delay of Signal Node({nodeID}): {self.intersection_Total_Delay}",4)
-        loggings.info(f"Average Delay of Signal Node({nodeID}): {self.intersection_Average_Delay}",4)
+        loggings.info(f"Total Delay of Signal Node({nodeID}): {round(self.intersection_Total_Delay,1)}",4)
+        loggings.info(f"Average Delay of Signal Node({nodeID}): {round(self.intersection_Average_Delay,1)}",4)
 
     def Determine_Signal_Intersection_LOS(self, nodeID):
         loggings.info('Step 2.12: Determine Signal Intersection LOS', 3)
@@ -861,7 +861,7 @@ def Read_Input_Data():
 
                 g_node_map[main_node_id].AddMovementVolume(osm_node_id,node_id,ib_link_id, ob_link_id,ib_osm_node_id,ob_osm_node_id, movementStr, init_volume, lanes,
                                                            sharedLanes, geometry, mvmt_id)
-                g_node_map[main_node_id].OMS_Node_ID=main_node_id
+                g_node_map[main_node_id].OSM_Node_ID=main_node_id
                 mainModual.g_number_of_movements +=1
     g_info_String = "Number of Nodes = "
     g_info_String += str(mainModual.g_number_of_nodes)
@@ -889,8 +889,9 @@ def Get_Signal_Timing_Movement_Info():
     signal_timing_phase_list = []
     signal_phase_mvmt_list = []
     for node_id, sn in g_node_map.items():
-        cycle_time_in_sec = int(max(10, sn.c_Min))
-        cycle_num = int( (sn.end_time_in_min - sn.start_time_in_min) * 60 / cycle_time_in_sec)
+        max_green_time = max(sn.green_Time_Stage_Array)
+        cycle_time_in_sec = int(max(10, sn.c_Min, max_green_time))
+        cycle_num = int((sn.end_time_in_min - sn.start_time_in_min) * 60 / cycle_time_in_sec)
         offset_in_sec = 0
         start_time_in_sec = int(sn.start_time_in_min * 60 + offset_in_sec)
         signal_phase_mvmt_id = 0
@@ -900,12 +901,14 @@ def Get_Signal_Timing_Movement_Info():
                 for so in range(len(sn.movement_Array[m].StageNo_in_Order)):
                     StageNo = sn.movement_Array[m].StageNo_in_Order[so]
 
+
+
                     cy=0
                     start=0
                     start_green_time_in_sec =int(sn.cumulative_Green_Start_Time_Stage_Array[
                                                    StageNo.value] + cycle_time_in_sec * cy + start*start_time_in_sec)
-                    end_green_time_in_sec = int(sn.cumulative_Green_End_Time_Stage_Array[
-                                                 StageNo.value] + cycle_time_in_sec * cy + start*start_time_in_sec)
+                    end_green_time_in_sec = min(cycle_time_in_sec,int(sn.cumulative_Green_End_Time_Stage_Array[
+                                                 StageNo.value] + cycle_time_in_sec * cy + start*start_time_in_sec))
                     start_hour = int(start_green_time_in_sec / 3600)
                     start_min = int(start_green_time_in_sec / 60 - start_hour * 60)
                     start_sec = int(start_green_time_in_sec % 60)
@@ -929,7 +932,7 @@ def Get_Signal_Timing_Movement_Info():
                     signal_timing_phase_list.append([
                         sn.movement_Array[m].mvmt_id,  # mvmt_id
                         StageNo.value,  # timing_phase_id
-                        EMovement_Index(m).name,  # movement str
+                        # EMovement_Index(m).name,  # movement str
                         0,  # time_plan_id
                         green_time_window,#time_window
                         f'{NEMA_Phase.value}',  # signal_phase_num
@@ -942,9 +945,10 @@ def Get_Signal_Timing_Movement_Info():
                         redTime,  # walk_time
                         cycle_time_in_sec,#cycle_time_in_sec
                         '',  # ped_clearance
-                        sn.movement_Array[m].movementIndex.name,
+                        sn.movement_Array[m].movementIndex.name,#mvmt_txt_id movement_str
                         f'{ring.value}',  # ring
                         f'{barrier.value}',  # barrier
+                        StageNo.value, #stageNO
                         '',  # position
                         capacity,
                         v_over_c,
@@ -952,10 +956,13 @@ def Get_Signal_Timing_Movement_Info():
                         sn.movement_Array[m].Geometry  # geometry
                     ])
                     protection=sn.left_Turn_Treatment_index_to_str_map[sn.movement_Array[m].Left_Turn_Treatment]
+                    if protection=='':
+                        protection='protected'
                     signal_phase_mvmt_list.append([
                         signal_phase_mvmt_id,  # signal_phase_mvmt_id
                         '',  # controller_id
-                        StageNo.value,  # timing_phase_id
+                        # StageNo.value,  # timing_phase_id
+                        sn.movement_Array[m].movementIndex.name,#mvmt_txt_id
                         f'{NEMA_Phase.value}',  # signal_phase_num
                         0,  # timing_plan_id
                         sn.movement_Array[m].mvmt_id,  # mvmt_id
@@ -967,7 +974,7 @@ def Get_Signal_Timing_Movement_Info():
                         sn.movement_Array[m].ob_osm_node_id,  # ob_osm_node_id
                         protection,  # protection
                         osm_web_address,#osm_web_address
-                        sn.movement_Array[m].Geometry  # geometory
+                        sn.movement_Array[m].Geometry  # geometry
                     ])
                     signal_phase_mvmt_id += 1
     return signal_timing_phase_list, signal_phase_mvmt_list
@@ -977,14 +984,14 @@ def Output_Singal_Timing_Movement_Files():
     signal_timing_phase_list, signal_phase_mvmt_list=Get_Signal_Timing_Movement_Info()
 
     signal_timing_phase_list_df=pd.DataFrame(signal_timing_phase_list,
-                                             columns=['mvmt_id','timing_phase_id','movement_str','timing_plan_id','green_time_window',
+                                             columns=['mvmt_id','timing_phase_id','timing_plan_id','green_time_window',
                                                       'signal_phase_num', 'min_green', 'max_green','start_green_time','end_green_time','extension', 'clearance',
-                                                      'walk_time','cycle_time', 'ped_clearance','movement_str',
-                                                      'ring', 'barrier', 'position','capacity','v_over_c','osm_web_address','geometry'])
+                                                      'walk_time','cycle_time', 'ped_clearance','mvmt_txt_id',
+                                                      'ring', 'barrier','stage_no', 'position','capacity','v_over_c','osm_web_address','geometry'])
     signal_phase_mvmt_list_df=pd.DataFrame(signal_phase_mvmt_list,
-                                             columns=['signal_phase_mvmt_id',  'controller_id',
-                                                      'timing_phase_id', 'signal_phase_num', 'timing_plan_id','mvmt_id','node_id','osm_node_id', 'ib_link_id',
-                                                      'ob_link_id','ib_osm_node_id','ob_osm_node_id','protection','osm_web_address','geometory'])
+                                             columns=['signal_phase_mvmt_id',  'controller_id','mvmt_txt_id',
+                                                      'signal_phase_num', 'timing_plan_id','mvmt_id','node_id','osm_node_id', 'ib_link_id',
+                                                      'ob_link_id','ib_osm_node_id','ob_osm_node_id','protection','osm_web_address','geometry'])#'timing_phase_id',
 
     signal_timing_phase_list_df.to_csv('signal_timing_phase.csv',index=False)
     signal_phase_mvmt_list_df.to_csv('signal_phase_mvmt.csv',index=False)
@@ -1000,7 +1007,7 @@ def Get_Timing_Info(merge_table):
 
     for i in range(len(merge_table['mvmt_id'])):
         mvmt_id = str(merge_table['mvmt_id'][i])
-        oms_node_id = str(merge_table['osm_node_id'][i])
+        osm_node_id = str(merge_table['osm_node_id'][i])
         node_id=str(merge_table['node_id'][i])
         ib_link_id=str(merge_table['ib_link_id'][i])
         ob_link_id=str(merge_table['ob_link_id'][i])
@@ -1009,7 +1016,7 @@ def Get_Timing_Info(merge_table):
         signal_phase_num=str(merge_table['signal_phase_num_x'][i])
         ring=str(merge_table['ring'][i])
         barrier=str(merge_table['barrier'][i])
-        stage_no=str(merge_table['timing_phase_id_x'][i])
+        stage_no=str(merge_table['stage_no'][i])
         timing_plan_id=str(merge_table['timing_plan_id_x'][i])
         green_time_window=str(merge_table['green_time_window'][i])
         green_time=str(merge_table['min_green'][i])
@@ -1020,15 +1027,15 @@ def Get_Timing_Info(merge_table):
         osm_web_address=str(merge_table['osm_web_address_x'][i])
         capacity=str(merge_table['capacity'][i])
         v_over_c=str(merge_table['v_over_c'][i])
-        movement_str=str(merge_table['movement_str'][i])
+        mvmt_txt_id=str(merge_table['mvmt_txt_id_x'][i])#mvmt_txt_id movement_str
         protection=str(merge_table['protection'][i])
         if protection=='nan':
             protection=''
-        geometory=str(merge_table['geometory'][i])
+        geometry=str(merge_table['geometry_x'][i])
 
         timing_file_list.append([
             mvmt_id,
-            oms_node_id,
+            osm_node_id,
             node_id,
             ib_link_id,
             ob_link_id,
@@ -1047,10 +1054,10 @@ def Get_Timing_Info(merge_table):
             walk_time,
             capacity,
             v_over_c,
-            movement_str,
+            mvmt_txt_id,#mvmt_txt_id
             protection,
             osm_web_address,
-            geometory
+            geometry
         ])
     return timing_file_list
 def Output_Timing_File():
@@ -1058,7 +1065,7 @@ def Output_Timing_File():
     timing_file_list=Get_Timing_Info(merge_table)
     timing_file_list_df = pd.DataFrame(timing_file_list,
                                              columns=[  'mvmt_id',
-                                                        'oms_node_id',
+                                                        'osm_node_id',
                                                         'node_id',
                                                         'ib_link_id',
                                                         'ob_link_id',
@@ -1071,17 +1078,17 @@ def Output_Timing_File():
                                                         'timing_plan_id',
                                                         'green_time_window',
                                                         'green_time',
-                                                        'cycle_time_in_sec',
+                                                        'cycle_time',
                                                         'start_green_time',
                                                         'end_green_time',
                                                         'red_time',
                                                         'capacity',
                                                         'v_over_c',
-                                                        'movement_str',
+                                                        'mvmt_txt_id',
                                                         'protection',
                                                         'osm_web_address',
-                                                        'geometory'
-                                                      ])#should be defined thorough osm id , movement_str, geometry
+                                                        'geometry'
+                                                      ])
     timing_file_list_df.to_csv('timing.csv', index=False)
     loggings.info("Finished", 0)
 
@@ -1106,7 +1113,7 @@ def Output_Intermediate_Files(label_name):
                     approach_Existed_Movement_Matrix["R"][(m-1)//3]=0
 
         signal_Node_Code=GetSignalCode(signal_Node.major_Approach,approach_Existed_Movement_Matrix,str(osmID))
-        new_Output_Node=CSignal_Node_Inter(signal_Node_Code, x_coord=signal_Node.xcoord, y_coord=signal_Node.ycoord)
+        new_Output_Node=CSignal_Node_Inter(signal_Node_Code,osmID, x_coord=signal_Node.xcoord, y_coord=signal_Node.ycoord)
         signal_Node_List.Add_Signal_Node(new_Output_Node)
         #for movement
         for m in signal_Node.movement_Array:
@@ -1157,7 +1164,6 @@ def Input_Intermediate_Files(label_name):
                 if osm_node_id not in g_node_map.keys():
                     loggings.info("Step 1.1.1: Reading file node.csv...", 2)
                     parser = pd.read_csv(f"signal_node_{str(label_name)}_log.csv")
-                    init_parameters_Dict = {}
                     row=parser[parser['osm_node_id']==osm_node_id]
                     xcoord=row["x_coord"].values[0]
                     ycoord = row["y_coord"].values[0]
@@ -1177,7 +1183,7 @@ def Input_Intermediate_Files(label_name):
                     directionNo = int(parser_movement['directionNo'][i])
                     directionNo = EDirection(directionNo)
                     g_node_map[osm_node_id].AddMovementVolume_Additional(movementStr,stageNo_in_Order,groupNo,directionNo,movementCode)
-                g_node_map[osm_node_id].OMS_Node_ID=osm_node_id
+                g_node_map[osm_node_id].OSM_Node_ID=osm_node_id
                 mainModual.g_number_of_movements +=1
     g_info_String = "Number of Nodes = "
     g_info_String += str(mainModual.g_number_of_nodes)
@@ -1197,12 +1203,6 @@ def signal4gmns(data_Set_Path):
 def Display_signalNode_info():
     loggings.info('Step 2: Check the List of Signal Nodes')
     for key in g_node_map.keys():
-        print('OMS_NODE_ID:{key}'.format(key=key))
-
-
-    # for key, value in g_signal_node_map.items():
-    #     print('OMS_NODE_ID:{key}, {value}'.format(key=key, value=value.OMS_Node_ID))
-
-
+        loggings.info('OSM_NODE_ID:{key}'.format(key=key))
 #'road_link_id', 'from_node_id', 'to_node_id',
 #'main_node_id',
