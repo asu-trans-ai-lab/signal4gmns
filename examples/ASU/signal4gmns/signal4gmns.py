@@ -820,8 +820,11 @@ def Read_Input_Data():
     # loggings.info(g_info_String, 3)
 
 
-    loggings.info("Step 1.1: Reading file movement.csv...", 2)## I'm the first step!!
+    loggings.info("Step 1.1: Reading file movement.csv...", 2)
     parser_movement = pd.read_csv('movement.csv')
+    parser = pd.read_csv('node.csv')
+    pass_node_list=[]
+
     for i in range(len(parser_movement['mvmt_id'])):
         movementStr = str(parser_movement['movement_str'][i])
         if 'U' in movementStr:
@@ -844,14 +847,17 @@ def Read_Input_Data():
             init_volume=lanes * 1000 * 0.5 if 'L' not in movementStr else lanes * 200
         # sharedLanes = parser_movement['sharedLanes'][i]
         sharedLanes = 1
-
-
+        if main_node_id in pass_node_list:
+            continue
         if len(movementStr) > 0 and movementStr != 'nan':
             if main_node_id !='nan':
                 if main_node_id not in g_node_map.keys():
-                    loggings.info("Step 1.1.1: Reading file node.csv...", 2)
-                    parser = pd.read_csv('node.csv')
                     row=parser[parser['osm_node_id']==main_node_id]
+                    ctrl_type=row["ctrl_type"].values[0]
+                    if ctrl_type==0:
+                        pass_node_list.append(main_node_id)
+                        continue
+                    loggings.info("Step 1.1.1: Reading file node.csv...", 2)
                     xcoord=row["x_coord"].values[0]
                     ycoord = row["y_coord"].values[0]
                     mainModual.g_internal_node_to_seq_no_map[main_node_id] = internal_node_seq_no
@@ -900,9 +906,6 @@ def Get_Signal_Timing_Movement_Info():
             if sn.movement_Array[m].Enable:
                 for so in range(len(sn.movement_Array[m].StageNo_in_Order)):
                     StageNo = sn.movement_Array[m].StageNo_in_Order[so]
-
-
-
                     cy=0
                     start=0
                     start_green_time_in_sec =int(sn.cumulative_Green_Start_Time_Stage_Array[
@@ -1141,6 +1144,8 @@ def Input_Intermediate_Files(label_name):
     g_node_map = {}
     internal_node_seq_no=0
     parser_movement = pd.read_csv(f"signal_movement_{str(label_name)}_log.csv")
+    parser = pd.read_csv(f"signal_node_{str(label_name)}_log.csv")
+
     for i in range(len(parser_movement['movement_code'])):
         movementCode = str(parser_movement['movement_code'][i])
         movementStr = str(parser_movement['movement_str'][i])
@@ -1162,8 +1167,7 @@ def Input_Intermediate_Files(label_name):
         if len(movementStr) > 0 and movementStr != 'nan':
             if osm_node_id !='':
                 if osm_node_id not in g_node_map.keys():
-                    loggings.info("Step 1.1.1: Reading file node.csv...", 2)
-                    parser = pd.read_csv(f"signal_node_{str(label_name)}_log.csv")
+                    loggings.info("Step 2.1.1: Reading file node.csv...", 2)
                     row=parser[parser['osm_node_id']==osm_node_id]
                     xcoord=row["x_coord"].values[0]
                     ycoord = row["y_coord"].values[0]
