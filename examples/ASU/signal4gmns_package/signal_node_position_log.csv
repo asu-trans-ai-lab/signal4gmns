@@ -1,0 +1,4 @@
+signal_code,osm_node_id,x_coord,y_coord,reference_cycle_length
+T|Ma_NS|L_WS|T_NS|R_WN|,41573974,-111.9262973,33.4128826,90
+#|Ma_NS|L_A|T_A|R_A|,41573980,-111.9263035,33.4168382,120
+T|Ma_NS|L_EN|T_NS|R_ES|,41573982,-111.9262965,33.4191375,90

@@ -1,0 +1,345 @@
+Set Logging System: 2021-06-07 00:42:15.352650
+--Set Global Variable
+--Set Array, Matrix, Dictionary Size
+Initialization Completed!
+Build Main Module
+--Step 0: Set Working Directory
+--Dataset_Path:root
+Start Iterating
+--Step 1: Load Data
+----Step 1.0: Configuration
+--Working Directory:D:\Codes\PycharmProjects\signal4gmns_package
+----Step 1.1: Reading file movement.csv...
+----Step 1.1.1: Reading file node.csv...
+--Set Parameters for Signal Node
+--Checking .yaml file
+----Main Node ID: 41573974
+------Add Movement: WBL, Features: link_id(in:253,out:1101), Volume(105), Lanes(1)
+------Add Movement: WBR, Features: link_id(in:253,out:1102), Volume(110), Lanes(1)
+------Add Movement: NBR, Features: link_id(in:1100,out:252), Volume(110), Lanes(1)
+------Add Movement: NBT, Features: link_id(in:1100,out:1102), Volume(930), Lanes(3)
+------Add Movement: SBL, Features: link_id(in:1103,out:252), Volume(105), Lanes(1)
+------Add Movement: SBT, Features: link_id(in:1103,out:1101), Volume(310), Lanes(1)
+----Step 1.1.1: Reading file node.csv...
+--Set Parameters for Signal Node
+--Checking .yaml file
+----Main Node ID: 41573980
+------Add Movement: SBT, Features: link_id(in:1014,out:1035), Volume(620), Lanes(2)
+------Add Movement: SBR, Features: link_id(in:1014,out:1571), Volume(110), Lanes(1)
+------Add Movement: SBL, Features: link_id(in:1014,out:1572), Volume(105), Lanes(1)
+------Add Movement: NBT, Features: link_id(in:1034,out:1013), Volume(620), Lanes(2)
+------Add Movement: NBL, Features: link_id(in:1034,out:1571), Volume(105), Lanes(1)
+------Add Movement: NBR, Features: link_id(in:1034,out:1572), Volume(110), Lanes(1)
+------Add Movement: EBL, Features: link_id(in:1570,out:1013), Volume(105), Lanes(1)
+------Add Movement: EBR, Features: link_id(in:1570,out:1035), Volume(110), Lanes(1)
+------Add Movement: EBT, Features: link_id(in:1570,out:1572), Volume(310), Lanes(1)
+------Add Movement: WBR, Features: link_id(in:1573,out:1013), Volume(110), Lanes(1)
+------Add Movement: WBL, Features: link_id(in:1573,out:1035), Volume(105), Lanes(1)
+------Add Movement: WBT, Features: link_id(in:1573,out:1571), Volume(310), Lanes(1)
+----Step 1.1.1: Reading file node.csv...
+--Set Parameters for Signal Node
+--Checking .yaml file
+----Main Node ID: 41573982
+------Add Movement: NBT, Features: link_id(in:1017,out:1025), Volume(310), Lanes(1)
+------Add Movement: NBL, Features: link_id(in:1017,out:1566), Volume(105), Lanes(1)
+------Add Movement: SBT, Features: link_id(in:1026,out:1018), Volume(620), Lanes(2)
+------Add Movement: SBR, Features: link_id(in:1026,out:1566), Volume(110), Lanes(1)
+------Add Movement: EBR, Features: link_id(in:1337,out:1018), Volume(110), Lanes(1)
+------Add Movement: EBL, Features: link_id(in:1337,out:1025), Volume(105), Lanes(1)
+------Add Movement: EBR, Features: link_id(in:1337,out:1566), Volume(110), Lanes(1)
+------Number of Nodes = 3
+------Number of Movement = 25
+--Step 2: Check the List of Signal Nodes
+--OSM_NODE_ID:41573974
+--OSM_NODE_ID:41573980
+--OSM_NODE_ID:41573982
+--Module 1: Output Location for each Signal Node
+--Module 2: Perform Left turn treatment for each Signal Node
+--Working Directory:D:\Codes\PycharmProjects\signal4gmns_package
+----Step 2.1.1: Reading intermediate file node.csv...
+--Set Parameters for Signal Node
+--Checking .yaml file
+----Main Node ID: 41573974
+------Add Movement: WBL, Features: link_id(in:253,out:1101), Volume(105), Lanes(1)
+------Add Movement: WBR, Features: link_id(in:253,out:1102), Volume(110), Lanes(1)
+------Add Movement: NBT, Features: link_id(in:1100,out:1102), Volume(930), Lanes(3)
+------Add Movement: NBR, Features: link_id(in:1100,out:252), Volume(110), Lanes(1)
+------Add Movement: SBL, Features: link_id(in:1103,out:252), Volume(105), Lanes(1)
+------Add Movement: SBT, Features: link_id(in:1103,out:1101), Volume(310), Lanes(1)
+----Step 2.1.1: Reading intermediate file node.csv...
+--Set Parameters for Signal Node
+--Checking .yaml file
+----Main Node ID: 41573980
+------Add Movement: EBL, Features: link_id(in:1570,out:1013), Volume(105), Lanes(1)
+------Add Movement: EBT, Features: link_id(in:1570,out:1572), Volume(310), Lanes(1)
+------Add Movement: EBR, Features: link_id(in:1570,out:1035), Volume(110), Lanes(1)
+------Add Movement: WBL, Features: link_id(in:1573,out:1035), Volume(105), Lanes(1)
+------Add Movement: WBT, Features: link_id(in:1573,out:1571), Volume(310), Lanes(1)
+------Add Movement: WBR, Features: link_id(in:1573,out:1013), Volume(110), Lanes(1)
+------Add Movement: NBL, Features: link_id(in:1034,out:1571), Volume(105), Lanes(1)
+------Add Movement: NBT, Features: link_id(in:1034,out:1013), Volume(620), Lanes(2)
+------Add Movement: NBR, Features: link_id(in:1034,out:1572), Volume(110), Lanes(1)
+------Add Movement: SBL, Features: link_id(in:1014,out:1572), Volume(105), Lanes(1)
+------Add Movement: SBT, Features: link_id(in:1014,out:1035), Volume(620), Lanes(2)
+------Add Movement: SBR, Features: link_id(in:1014,out:1571), Volume(110), Lanes(1)
+----Step 2.1.1: Reading intermediate file node.csv...
+--Set Parameters for Signal Node
+--Checking .yaml file
+----Main Node ID: 41573982
+------Add Movement: EBL, Features: link_id(in:1337,out:1025), Volume(105), Lanes(1)
+------Add Movement: EBR, Features: link_id(in:1337,out:1566), Volume(110), Lanes(1)
+------Add Movement: NBL, Features: link_id(in:1017,out:1566), Volume(105), Lanes(1)
+------Add Movement: NBT, Features: link_id(in:1017,out:1025), Volume(310), Lanes(1)
+------Add Movement: SBT, Features: link_id(in:1026,out:1018), Volume(620), Lanes(2)
+------Add Movement: SBR, Features: link_id(in:1026,out:1566), Volume(110), Lanes(1)
+------Number of Nodes = 6
+------Number of Movement = 49
+------Step 2.1: Set Left Turn Treatment
+--------Movement: WBL, Features: ELeft_Turn_Treatment(prot)
+--------Movement: SBL, Features: ELeft_Turn_Treatment(perm)
+------Step 2.1: Set Left Turn Treatment
+--------Movement: EBL, Features: ELeft_Turn_Treatment(perm)
+--------Movement: WBL, Features: ELeft_Turn_Treatment(perm)
+--------Movement: NBL, Features: ELeft_Turn_Treatment(perm)
+--------Movement: SBL, Features: ELeft_Turn_Treatment(perm)
+------Step 2.1: Set Left Turn Treatment
+--------Movement: EBL, Features: ELeft_Turn_Treatment(prot)
+--------Movement: NBL, Features: ELeft_Turn_Treatment(perm)
+--Module 3: Perform QEM for each Signal Node
+--Working Directory:D:\Codes\PycharmProjects\signal4gmns_package
+----Step 2.1.1: Reading intermediate file node.csv...
+--Set Parameters for Signal Node
+--Checking .yaml file
+----Main Node ID: 41573974
+------Add Movement: WBL, Features: link_id(in:253,out:1101), Volume(105), Lanes(1)
+------Add Movement: WBR, Features: link_id(in:253,out:1102), Volume(110), Lanes(1)
+------Add Movement: NBT, Features: link_id(in:1100,out:1102), Volume(930), Lanes(3)
+------Add Movement: NBR, Features: link_id(in:1100,out:252), Volume(110), Lanes(1)
+------Add Movement: SBL, Features: link_id(in:1103,out:252), Volume(105), Lanes(1)
+------Add Movement: SBT, Features: link_id(in:1103,out:1101), Volume(310), Lanes(1)
+----Step 2.1.1: Reading intermediate file node.csv...
+--Set Parameters for Signal Node
+--Checking .yaml file
+----Main Node ID: 41573980
+------Add Movement: EBL, Features: link_id(in:1570,out:1013), Volume(105), Lanes(1)
+------Add Movement: EBT, Features: link_id(in:1570,out:1572), Volume(310), Lanes(1)
+------Add Movement: EBR, Features: link_id(in:1570,out:1035), Volume(110), Lanes(1)
+------Add Movement: WBL, Features: link_id(in:1573,out:1035), Volume(105), Lanes(1)
+------Add Movement: WBT, Features: link_id(in:1573,out:1571), Volume(310), Lanes(1)
+------Add Movement: WBR, Features: link_id(in:1573,out:1013), Volume(110), Lanes(1)
+------Add Movement: NBL, Features: link_id(in:1034,out:1571), Volume(105), Lanes(1)
+------Add Movement: NBT, Features: link_id(in:1034,out:1013), Volume(620), Lanes(2)
+------Add Movement: NBR, Features: link_id(in:1034,out:1572), Volume(110), Lanes(1)
+------Add Movement: SBL, Features: link_id(in:1014,out:1572), Volume(105), Lanes(1)
+------Add Movement: SBT, Features: link_id(in:1014,out:1035), Volume(620), Lanes(2)
+------Add Movement: SBR, Features: link_id(in:1014,out:1571), Volume(110), Lanes(1)
+----Step 2.1.1: Reading intermediate file node.csv...
+--Set Parameters for Signal Node
+--Checking .yaml file
+----Main Node ID: 41573982
+------Add Movement: EBL, Features: link_id(in:1337,out:1025), Volume(105), Lanes(1)
+------Add Movement: EBR, Features: link_id(in:1337,out:1566), Volume(110), Lanes(1)
+------Add Movement: NBL, Features: link_id(in:1017,out:1566), Volume(105), Lanes(1)
+------Add Movement: NBT, Features: link_id(in:1017,out:1025), Volume(310), Lanes(1)
+------Add Movement: SBT, Features: link_id(in:1026,out:1018), Volume(620), Lanes(2)
+------Add Movement: SBR, Features: link_id(in:1026,out:1566), Volume(110), Lanes(1)
+------Number of Nodes = 9
+------Number of Movement = 73
+------Step 2.3: Set Saturation Flow Rate Matrix
+--------Saturation Flow Rate of Movement(WBL) and Stage(stage3): 1530.0
+--------Saturation Flow Rate of Movement(WBR) and Stage(stage4): 1530.0
+--------Saturation Flow Rate of Movement(NBT) and Stage(stage2): 4590.0
+--------Saturation Flow Rate of Movement(NBR) and Stage(stage2): 1530.0
+--------Saturation Flow Rate of Movement(SBL) and Stage(stage1): -320.42958247553594
+--------Saturation Flow Rate of Movement(SBT) and Stage(stage2): 1530.0
+------Step 2.4: Calculate Max Flow Ratio 
+------Step 2.5: Calculate Total Cycle Lost Time 
+--------Total Cycle Lost Time: 16s
+------Step 2.6: Calculate the Minimum and Optimal Cycle Length
+--------Minimum Cycle Length: 90s
+--------Optimal Cycle Length: 60s
+------Step 2.7: Calculate x_c
+--------x_c: 0.5047694753577107
+------Step 2.8: Calculate Green Time for Stages
+------Step 2.9: Print Green Time for Stages
+--------Green Time of Stage1: 12s
+--------Start Green Time of Stage 1: 0s
+--------End Green Time of Stage 1: 12s
+--------Green Time of Stage1: 59.5s
+--------Start Green Time of Stage 1: 12s
+--------End Green Time of Stage 1: 71.5s
+--------Green Time of Stage1: 14.9s
+--------Start Green Time of Stage 1: 71.5s
+--------End Green Time of Stage 1: 86.4s
+--------Green Time of Stage1: 15.6s
+--------Start Green Time of Stage 1: 86.4s
+--------End Green Time of Stage 1: 102.0s
+--------Effective Green Time of Stage1: 14s
+--------Start Effective Green Time of Stage 1: 0s
+--------End Effective Green Time of Stage 1: 0s
+--------Effective Green Time of Stage1: 61.5s
+--------Start Effective Green Time of Stage 1: 14s
+--------End Effective Green Time of Stage 1: 14s
+--------Effective Green Time of Stage1: 16.9s
+--------Start Effective Green Time of Stage 1: 75.5s
+--------End Effective Green Time of Stage 1: 75.5s
+--------Effective Green Time of Stage1: 17.6s
+--------Start Effective Green Time of Stage 1: 92.4s
+--------End Effective Green Time of Stage 1: 92.4s
+------Step 2.10: Calculate Capacity and V over C Ratio
+--------a. Capacity of Stage(1) and Movement(SBL): -49.8
+--------b. V/C of Stage(1) and Movement(SBL): -2.1
+--------a. Capacity of Stage(2) and Movement(NBT): 3137.9
+--------b. V/C of Stage(2) and Movement(NBT): 0.3
+--------a. Capacity of Stage(2) and Movement(NBR): 1046.0
+--------b. V/C of Stage(2) and Movement(NBR): 0.1
+--------a. Capacity of Stage(2) and Movement(SBT): 1046.0
+--------b. V/C of Stage(2) and Movement(SBT): 0.3
+--------a. Capacity of Stage(3) and Movement(WBL): 287.0
+--------b. V/C of Stage(3) and Movement(WBL): 0.4
+--------a. Capacity of Stage(4) and Movement(WBR): 299.0
+--------b. V/C of Stage(4) and Movement(WBR): 0.4
+------Step 2.11: Calculate Signal Delay
+--------Total Delay of Signal Node(41573974): 230438.2
+--------Average Delay of Signal Node(41573974): 138.0
+------Step 2.12: Determine Signal Intersection LOS
+--------LOS of Signal Node(41573974): F
+------Step 2.3: Set Saturation Flow Rate Matrix
+--------Saturation Flow Rate of Movement(EBL) and Stage(stage3): -875.9677079345114
+--------Saturation Flow Rate of Movement(EBT) and Stage(stage4): 1530.0
+--------Saturation Flow Rate of Movement(EBR) and Stage(stage4): 1530.0
+--------Saturation Flow Rate of Movement(WBL) and Stage(stage3): -875.9677079345114
+--------Saturation Flow Rate of Movement(WBT) and Stage(stage4): 1530.0
+--------Saturation Flow Rate of Movement(WBR) and Stage(stage4): 1530.0
+--------Saturation Flow Rate of Movement(NBL) and Stage(stage1): -530.8122736787684
+--------Saturation Flow Rate of Movement(NBT) and Stage(stage2): 3060.0
+--------Saturation Flow Rate of Movement(NBR) and Stage(stage2): 1530.0
+--------Saturation Flow Rate of Movement(SBL) and Stage(stage1): -530.8122736787684
+--------Saturation Flow Rate of Movement(SBT) and Stage(stage2): 3060.0
+--------Saturation Flow Rate of Movement(SBR) and Stage(stage2): 1530.0
+------Step 2.4: Calculate Max Flow Ratio 
+------Step 2.5: Calculate Total Cycle Lost Time 
+--------Total Cycle Lost Time: 16s
+------Step 2.6: Calculate the Minimum and Optimal Cycle Length
+--------Minimum Cycle Length: 120s
+--------Optimal Cycle Length: 64.30434782608697s
+------Step 2.7: Calculate x_c
+--------x_c: 0.6334841628959277
+------Step 2.8: Calculate Green Time for Stages
+------Step 2.9: Print Green Time for Stages
+--------Green Time of Stage1: 12s
+--------Start Green Time of Stage 1: 0s
+--------End Green Time of Stage 1: 12s
+--------Green Time of Stage1: 60.0s
+--------Start Green Time of Stage 1: 12s
+--------End Green Time of Stage 1: 72.0s
+--------Green Time of Stage1: 12s
+--------Start Green Time of Stage 1: 72.0s
+--------End Green Time of Stage 1: 84.0s
+--------Green Time of Stage1: 60.0s
+--------Start Green Time of Stage 1: 84.0s
+--------End Green Time of Stage 1: 144.0s
+--------Effective Green Time of Stage1: 14s
+--------Start Effective Green Time of Stage 1: 0s
+--------End Effective Green Time of Stage 1: 0s
+--------Effective Green Time of Stage1: 62.0s
+--------Start Effective Green Time of Stage 1: 14s
+--------End Effective Green Time of Stage 1: 14s
+--------Effective Green Time of Stage1: 14s
+--------Start Effective Green Time of Stage 1: 76.0s
+--------End Effective Green Time of Stage 1: 76.0s
+--------Effective Green Time of Stage1: 62.0s
+--------Start Effective Green Time of Stage 1: 90.0s
+--------End Effective Green Time of Stage 1: 90.0s
+------Step 2.10: Calculate Capacity and V over C Ratio
+--------a. Capacity of Stage(1) and Movement(NBL): -61.9
+--------b. V/C of Stage(1) and Movement(NBL): -1.7
+--------a. Capacity of Stage(1) and Movement(SBL): -61.9
+--------b. V/C of Stage(1) and Movement(SBL): -1.7
+--------a. Capacity of Stage(2) and Movement(NBT): 1581.0
+--------b. V/C of Stage(2) and Movement(NBT): 0.4
+--------a. Capacity of Stage(2) and Movement(NBR): 790.5
+--------b. V/C of Stage(2) and Movement(NBR): 0.1
+--------a. Capacity of Stage(2) and Movement(SBT): 1581.0
+--------b. V/C of Stage(2) and Movement(SBT): 0.4
+--------a. Capacity of Stage(2) and Movement(SBR): 790.5
+--------b. V/C of Stage(2) and Movement(SBR): 0.1
+--------a. Capacity of Stage(3) and Movement(EBL): -102.2
+--------b. V/C of Stage(3) and Movement(EBL): -1.0
+--------a. Capacity of Stage(3) and Movement(WBL): -102.2
+--------b. V/C of Stage(3) and Movement(WBL): -1.0
+--------a. Capacity of Stage(4) and Movement(EBT): 790.5
+--------b. V/C of Stage(4) and Movement(EBT): 0.4
+--------a. Capacity of Stage(4) and Movement(EBR): 790.5
+--------b. V/C of Stage(4) and Movement(EBR): 0.1
+--------a. Capacity of Stage(4) and Movement(WBT): 790.5
+--------b. V/C of Stage(4) and Movement(WBT): 0.4
+--------a. Capacity of Stage(4) and Movement(WBR): 790.5
+--------b. V/C of Stage(4) and Movement(WBR): 0.1
+------Step 2.11: Calculate Signal Delay
+--------Total Delay of Signal Node(41573980): 391032.4
+--------Average Delay of Signal Node(41573980): 143.8
+------Step 2.12: Determine Signal Intersection LOS
+--------LOS of Signal Node(41573980): F
+------Step 2.3: Set Saturation Flow Rate Matrix
+--------Saturation Flow Rate of Movement(EBL) and Stage(stage3): 1530.0
+--------Saturation Flow Rate of Movement(EBR) and Stage(stage4): 1530.0
+--------Saturation Flow Rate of Movement(NBL) and Stage(stage1): -530.8122736787684
+--------Saturation Flow Rate of Movement(NBT) and Stage(stage2): 1530.0
+--------Saturation Flow Rate of Movement(SBT) and Stage(stage2): 3060.0
+--------Saturation Flow Rate of Movement(SBR) and Stage(stage2): 1530.0
+------Step 2.4: Calculate Max Flow Ratio 
+------Step 2.5: Calculate Total Cycle Lost Time 
+--------Total Cycle Lost Time: 16s
+------Step 2.6: Calculate the Minimum and Optimal Cycle Length
+--------Minimum Cycle Length: 90s
+--------Optimal Cycle Length: 60s
+------Step 2.7: Calculate x_c
+--------x_c: 0.5047694753577107
+------Step 2.8: Calculate Green Time for Stages
+------Step 2.9: Print Green Time for Stages
+--------Green Time of Stage1: 12s
+--------Start Green Time of Stage 1: 0s
+--------End Green Time of Stage 1: 12s
+--------Green Time of Stage1: 59.5s
+--------Start Green Time of Stage 1: 12s
+--------End Green Time of Stage 1: 71.5s
+--------Green Time of Stage1: 14.9s
+--------Start Green Time of Stage 1: 71.5s
+--------End Green Time of Stage 1: 86.4s
+--------Green Time of Stage1: 15.6s
+--------Start Green Time of Stage 1: 86.4s
+--------End Green Time of Stage 1: 102.0s
+--------Effective Green Time of Stage1: 14s
+--------Start Effective Green Time of Stage 1: 0s
+--------End Effective Green Time of Stage 1: 0s
+--------Effective Green Time of Stage1: 61.5s
+--------Start Effective Green Time of Stage 1: 14s
+--------End Effective Green Time of Stage 1: 14s
+--------Effective Green Time of Stage1: 16.9s
+--------Start Effective Green Time of Stage 1: 75.5s
+--------End Effective Green Time of Stage 1: 75.5s
+--------Effective Green Time of Stage1: 17.6s
+--------Start Effective Green Time of Stage 1: 92.4s
+--------End Effective Green Time of Stage 1: 92.4s
+------Step 2.10: Calculate Capacity and V over C Ratio
+--------a. Capacity of Stage(1) and Movement(NBL): -82.6
+--------b. V/C of Stage(1) and Movement(NBL): -1.3
+--------a. Capacity of Stage(2) and Movement(NBT): 1046.0
+--------b. V/C of Stage(2) and Movement(NBT): 0.3
+--------a. Capacity of Stage(2) and Movement(SBT): 2091.9
+--------b. V/C of Stage(2) and Movement(SBT): 0.3
+--------a. Capacity of Stage(2) and Movement(SBR): 1046.0
+--------b. V/C of Stage(2) and Movement(SBR): 0.1
+--------a. Capacity of Stage(3) and Movement(EBL): 287.0
+--------b. V/C of Stage(3) and Movement(EBL): 0.4
+--------a. Capacity of Stage(4) and Movement(EBR): 299.0
+--------b. V/C of Stage(4) and Movement(EBR): 0.4
+------Step 2.11: Calculate Signal Delay
+--------Total Delay of Signal Node(41573982): 127517.2
+--------Average Delay of Signal Node(41573982): 93.8
+------Step 2.12: Determine Signal Intersection LOS
+--------LOS of Signal Node(41573982): F
+--Step 5: Output signal_phase files
+----Step 4.1: Generating info for signal_timing_phase.csv and signal_phase_mvmt.csv
+Finished
