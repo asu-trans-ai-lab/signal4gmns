@@ -19,16 +19,16 @@ Wyoming
 (http://www.uwyo.edu/civil/faculty_staff/faculty/milan-zlatkovic/index.html,
 mzlatkov@uwyo.edu) for his Excel based Quick Estimation Method
 
-1.1. Excel files:
-https://github.com/milan1981/Sigma-X/blob/master/Sigma-X_v2_GMNS.xlsm
+1.1. Excel files: [milan1981/Sigma-X: Excel-based computational engine for
+signalized intersections (github.com)](https://github.com/milan1981/Sigma-X)
 
 1.2: Youtube teaching videos:
 
-1) <https://www.youtube.com/watch?v=Q1CxQFM9D5U>
+1.  <https://www.youtube.com/watch?v=Q1CxQFM9D5U>
 
-2) QGIS visualization video: [QGIS Visualization for GMNS Traffic Signal Data
-–](https://www.youtube.com/watch?v=6hoYJtEaTn4&t=8s) (contributed by Fan Yu
-@ASU)
+2.  QGIS visualization video: [QGIS Visualization for GMNS Traffic Signal Data
+    –](https://www.youtube.com/watch?v=6hoYJtEaTn4&t=8s) (contributed by Fan Yu
+    @ASU)
 
 <https://www.youtube.com/watch?v=6hoYJtEaTn4&t=8s>
 
