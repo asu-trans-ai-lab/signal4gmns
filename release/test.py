@@ -8,7 +8,7 @@ def Processing():
     Set_Working_Directory(data_Set_Path)
     intermediate_file_label='position'
     # Step 1: Load Data
-    Read_Input_Data()
+    Read_Movement_and_Node_Files()
     # Step 2: Check the List of Signal Nodes (Optional)
     Display_signalNode_info()
     # Step 3: perform three modules for each Signal Node
@@ -33,16 +33,16 @@ def Processing():
     #Step 6: convert signal_timing_phase.csv and signal_timing_phase.csv to timing.csv
     Output_Timing_File()
 
-def osm_2_gmns():
-    import osm2gmns as og
-    net = og.getNetFromOSMFile('map.osm', default_lanes=True, POIs=True)
-    og.generateNodeActivityInfo(net)
-    og.consolidateComplexIntersections(net)
-    og.connectPOIWithNet(net)
-    og.outputNetToCSV(net, output_folder='consolidated')
-    og.generateMovements(net)
-    og.outputNetToCSV(net)
-    og.show(net)
+# def osm_2_gmns():
+#     import osm2gmns as og
+#     net = og.getNetFromOSMFile('map.osm', default_lanes=True, POIs=True)
+#     og.connectPOIWithNet(net)
+#     og.generateNodeActivityInfo(net)
+#     og.consolidateComplexIntersections(net)
+#     og.outputNetToCSV(net, output_folder='consolidated')
+#     og.generateMovements(net)
+#     og.outputNetToCSV(net)
+#     og.show(net)
 
 
 #    og.saveFig(net)
@@ -50,7 +50,9 @@ def osm_2_gmns():
 
 if __name__ == '__main__':
     #convert .osm file to movement.csv etc.
-    osm_2_gmns()
-#   Processing()
+    # osm_2_gmns()
+
+
+    Processing()
 
 

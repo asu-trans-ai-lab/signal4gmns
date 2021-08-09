@@ -17,12 +17,24 @@ tools.
 Please check out the tool developed by Dr. Milan Zlatkovic at University of
 Wyoming
 (http://www.uwyo.edu/civil/faculty_staff/faculty/milan-zlatkovic/index.html,
-mzlatkov\@uwyo.edu) for his Excel based Quick Estimation Method
+mzlatkov@uwyo.edu) for his Excel based Quick Estimation Method
 
 1.1. Excel files:
 https://github.com/milan1981/Sigma-X/blob/master/Sigma-X_v2_GMNS.xlsm
 
-1.2: Youtube teaching video: <https://www.youtube.com/watch?v=Q1CxQFM9D5U>
+1.2: Youtube teaching videos:
+
+1) <https://www.youtube.com/watch?v=Q1CxQFM9D5U>
+
+2) QGIS visualization video: [QGIS Visualization for GMNS Traffic Signal Data
+–](https://www.youtube.com/watch?v=6hoYJtEaTn4&t=8s) (contributed by Fan Yu
+@ASU)
+
+<https://www.youtube.com/watch?v=6hoYJtEaTn4&t=8s>
+
+# 3) Introduction of UTDF2GMNS (contributed by Fan Yu @ASU)
+
+<https://www.youtube.com/watch?v=-m_szNHdWoo&t=1s>
 
 1.3: Research paper: Zlatkovic, Milan, and Xuesong Zhou. "Integration of signal
 timing estimation model and dynamic traffic assignment in feedback loops: System
@@ -79,8 +91,8 @@ intersection volume-to-capacity ratio; Control delay & LOS
 
 This python version aims to generate movement-based, phase-based signal control
 strategy, developed by the research teams led by Dr. Xuesong (Simon) Zhou at
-Arizona State University (xzhou74\@asu.edu) and Dr. Milan Zlatkovic at
-University of Wyoming
+Arizona State University (xzhou74@asu.edu) and Dr. Milan Zlatkovic at University
+of Wyoming
 
 >   Table 1. Folders of Vol2Timing package
 
@@ -102,8 +114,8 @@ mesoscopic and microscopic simulation.
 
 To visualize the location of signal intersections, please create a node.csv
 contains only nodes with field osm_highway== “traffic_signals”, and use
-<https://asu-trans-ai-lab.github.io/index.html#/> to visualize the locations of
-signalized intersections.
+[https://asu-trans-ai-lab.github.io/index.html\#/](https://asu-trans-ai-lab.github.io/index.html#/)
+to visualize the locations of signalized intersections.
 
 ![](media/9dfce61b30e45b0baa5aed3bb1758833.png)
 
@@ -151,7 +163,7 @@ First, we should extract movement, volume, and lane information from Fig.1.
 |------------------|-----|-----|-----|-----|------|-----|-----|-----|-----|-----|-----|-----|
 | **Volume**       | 300 | 900 | 200 | 250 | 1000 | 150 | 90  | 340 | 50  | 70  | 310 | 60  |
 | **No. of lanes** | 1   | 1   | 1   | 1   | 1    | 1   | 1   | 1   | 1   | 1   | 1   | 1   |
-| **Shared lanes** | \-  | \-  | \-  | \-  | \-   | \-  | \-  | \-  | \-  | \-  | \-  | \-  |
+| **Shared lanes** | -   | -   | -   | -   | -    | -   | -   | -   | -   | -   | -   | -   |
 
 Step 2. Select signal phasing
 
@@ -445,15 +457,15 @@ Step 8. Calculate Signal Delay and LOS
 
 **Vol2Timing results**
 
-| Movement                   | EBL               | EBT   | EBR   | WBL   | WBT    | WBR   | NBL   | NBT   | NBR   | SBL  | SBT   | SBR  |
-|----------------------------|-------------------|-------|-------|-------|--------|-------|-------|-------|-------|------|-------|------|
-| Phase                      | 5                 | 2     | 2     | 1     | 6      | 6     | 0     | 8     | 8     | 0    | 4     | 4    |
-| UnifDelay (s)              | 433.7             | 196.0 | 136.5 | 270.0 | \-40.3 | 107.2 | 91.1  | 944.3 | 120.7 | 85.2 | 553.5 | 82.6 |
-| LOS                        | D                 | E     | B     | D     | F      | B     | F     | F     | D     | F    | F     | D    |
-| Approach Delay (s)         | 95.8              |       |       | 42.8  |        |       | 640.1 |       |       | 380  |       |      |
-| Approach LOS               | F                 |       |       | D     |        |       | F     |       |       | F    |       |      |
-|                            |                   |       |       |       |        |       |       |       |       |      |       |      |
-| **Intersection Delay (s)** | **95.1**          |       |       |       |        |       |       |       |       |      |       |      |
-| **Intersection LOS**       | **F**             |       |       |       |        |       |       |       |       |      |       |      |
-| **Intersection V/C**       | **1.07**          |       |       |       |        |       |       |       |       |      |       |      |
-| **Intersection Status**    | **Over Capacity** |       |       |       |        |       |       |       |       |      |       |      |
+| Movement                   | EBL               | EBT   | EBR   | WBL   | WBT   | WBR   | NBL   | NBT   | NBR   | SBL  | SBT   | SBR  |
+|----------------------------|-------------------|-------|-------|-------|-------|-------|-------|-------|-------|------|-------|------|
+| Phase                      | 5                 | 2     | 2     | 1     | 6     | 6     | 0     | 8     | 8     | 0    | 4     | 4    |
+| UnifDelay (s)              | 433.7             | 196.0 | 136.5 | 270.0 | -40.3 | 107.2 | 91.1  | 944.3 | 120.7 | 85.2 | 553.5 | 82.6 |
+| LOS                        | D                 | E     | B     | D     | F     | B     | F     | F     | D     | F    | F     | D    |
+| Approach Delay (s)         | 95.8              |       |       | 42.8  |       |       | 640.1 |       |       | 380  |       |      |
+| Approach LOS               | F                 |       |       | D     |       |       | F     |       |       | F    |       |      |
+|                            |                   |       |       |       |       |       |       |       |       |      |       |      |
+| **Intersection Delay (s)** | **95.1**          |       |       |       |       |       |       |       |       |      |       |      |
+| **Intersection LOS**       | **F**             |       |       |       |       |       |       |       |       |      |       |      |
+| **Intersection V/C**       | **1.07**          |       |       |       |       |       |       |       |       |      |       |      |
+| **Intersection Status**    | **Over Capacity** |       |       |       |       |       |       |       |       |      |       |      |
