@@ -1,4 +1,4 @@
-# Vol2Timing
+# Signal4GMNS
 
 This python tool aims to offer a **light-weight computational engine** to
 generate optimize signal control timing data, and analyze the effectiveness of
