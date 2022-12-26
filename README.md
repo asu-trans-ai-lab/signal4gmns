@@ -32,11 +32,11 @@ signalized intersections (github.com)](https://github.com/milan1981/Sigma-X)
 
 <https://www.youtube.com/watch?v=6hoYJtEaTn4&t=8s>
 
-3. Introduction of UTDF2GMNS (contributed by Fan Yu @ASU)
+3. Introduction to Synchro 11: <https://www.youtube.com/watch?v=XXGOJl_7Owk&t=60s> (contributed by Sohum Berdia @ASU)
+
+4. Introduction of UTDF2GMNS (contributed by Fan Yu @ASU)
 
 <https://www.youtube.com/watch?v=-m_szNHdWoo&t=1s>
-
-4. Introduction to Synchro 11: <https://www.youtube.com/watch?v=XXGOJl_7Owk&t=60s> (contributed by Sohum Berdia @ASU)
 
 
 1.3: Research paper: Zlatkovic, Milan, and Xuesong Zhou. "Integration of signal
